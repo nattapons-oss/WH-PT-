@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WH Pantai Leave System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Padauk', 'Myanmar Text'; }
+        .nav-link { cursor: pointer; }
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-card { border-radius: 12px; color: white; border: none; }
+        .auth-box { max-width: 420px; margin: 40px auto; border-radius: 15px; border: none; }
+        .flatpickr-input[readonly] { background-color: #fff; }
+
+        .brand-logo { max-width: 180px; height: auto; display: block; margin: 0 auto 10px auto; }
+        .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; cursor: pointer; }
+        .table-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1; }
+        .profile-avatar-preview { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #6366f1; margin: 0 auto 10px auto; display: block; }
+        .form-user-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #3b82f6; margin: 0 auto 10px auto; display: block; }
+        
+        .profile-header-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid #7c3aed; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+
+        .card { border-radius: 15px; border: none; overflow: hidden; }
+        .card-header-dashboard { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; }
+        .card-header-form { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; }
+        .card-header-summary { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; }
+        .card-header-admin { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); color: white; }
+        .card-header-emp { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; }
+        .card-header-profile { background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: white; }
+
+        .table-custom-header thead { background-color: #1e293b; color: #ffffff; }
+        .table-custom-header th { border: none; padding: 12px 16px; }
+
+        .btn-lang { background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(5px); }
+        .btn-lang:hover { background: rgba(255, 255, 255, 0.3); color: white; }
+        
+        .sync-spinner { display: none; width: 1rem; height: 1rem; border-width: 0.15em; }
+
+        .offcanvas-profile { max-width: 360px; border-top-left-radius: 15px; border-bottom-left-radius: 15px; }
+    </style>
+</head>
+<body>
+
+<!-- 1. หน้า Auth -->
+<div id="authContainer" class="container">
+    <div id="loginCard" class="card shadow-lg auth-box">
+        <div class="card-header card-header-form p-4 text-center">
+            <img src="logo.png" alt="GREAT HILL CO.,LTD. Logo" class="brand-logo mb-2" onerror="this.style.display='none'">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold" id="loginTitle">เข้าสู่ระบบ / Login</h4>
+                <button class="btn btn-sm btn-lang lang-btn-label" onclick="toggleLanguage()">TH/EN/MM</button>
+            </div>
+            <p class="mb-0 mt-2 small opacity-75 fw-bold">WH Pantai System</p>
+        </div>
+        <div class="card-body p-4">
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-semibold" id="lblUsername">ชื่อผู้ใช้ / Username</label>
+                    <input type="text" class="form-control form-control-lg fs-6" id="loginUsername" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold" id="lblPassword">รหัสผ่าน / Password</label>
+                    <input type="password" class="form-control form-control-lg fs-6" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 btn-lg fs-6 shadow-sm mb-3" id="btnLogin">เข้าสู่ระบบ</button>
+                <div class="text-center">
+                    <span id="txtNoAccount" class="text-muted">ยังไม่มีบัญชี?</span> 
+                    <a href="#" onclick="showAuthPage('registerCard')" id="linkGoRegister" class="fw-bold text-decoration-none">สมัครสมาชิก</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerCard" class="card shadow-lg auth-box d-none">
+        <div class="card-header card-header-dashboard p-4 text-center">
+            <img src="logo.png" alt="GREAT HILL CO.,LTD. Logo" class="brand-logo mb-2" onerror="this.style.display='none'">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold" id="regTitle">สมัครสมาชิก / Register</h4>
+                <button class="btn btn-sm btn-lang lang-btn-label" onclick="toggleLanguage()">TH/EN/MM</button>
+            </div>
+            <p class="mb-0 mt-2 small opacity-75 fw-bold">WH Pantai (สำหรับพนักงาน)</p>
+        </div>
+        <div class="card-body p-4">
+            <form id="registerForm">
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-semibold" id="lblRegFullName">ชื่อ-นามสกุล / Full Name</label>
+                    <input type="text" class="form-control" id="regFullName" placeholder="เช่น สมชาย ใจดี" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-semibold" id="lblRegPhone">เบอร์โทรศัพท์ / Phone Number</label>
+                    <input type="tel" class="form-control" id="regPhone" placeholder="เช่น 0812345678" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-semibold" id="lblRegDept">แผนก / Department</label>
+                    <input type="text" class="form-control" id="regDept" placeholder="เช่น WH, Logistics, Admin" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-semibold" id="lblRegUser">ชื่อผู้ใช้ / Username</label>
+                    <input type="text" class="form-control" id="regUsername" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-semibold" id="lblRegPass">รหัสผ่าน / Password</label>
+                    <input type="password" class="form-control" id="regPassword" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100 btn-lg fs-6 shadow-sm mb-3" id="btnRegister">ลงทะเบียนพนักงาน</button>
+                <div class="text-center">
+                    <span id="txtHaveAccount" class="text-muted">มีบัญชีอยู่แล้ว?</span> 
+                    <a href="#" onclick="showAuthPage('loginCard')" id="linkGoLogin" class="fw-bold text-decoration-none">เข้าสู่ระบบ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Navbar -->
+<nav id="mainNav" class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm d-none">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#" id="navTitle">WH Pantai System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" onclick="switchPage('upcomingView')" id="menuUpcoming">Dashboard ลางาน</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchPage('requestView')" id="menuRequest">ฟอร์มบันทึกข้อมูล</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" onclick="switchPage('mySummaryView')" id="menuMySummary">สรุปการลาของฉัน</a>
+                </li>
+                <li class="nav-item admin-only">
+                    <a class="nav-link" onclick="switchPage('dashboardView')" id="menuDashboard">แดชบอร์ด & ประวัติ</a>
+                </li>
+                <li class="nav-item admin-only">
+                    <a class="nav-link" onclick="switchPage('employeeView')" id="menuEmployee">จัดการพนักงาน</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <div id="syncIndicator" class="spinner-border text-light sync-spinner" role="status"></div>
+                <button class="btn btn-sm btn-outline-info text-white" onclick="fetchCloudData()"><i class="fa-solid fa-rotate"></i> ดึงข้อมูลใหม่</button>
+                <img id="navAvatar" src="" alt="Avatar" class="nav-avatar" onclick="openProfileModal()" title="แก้ไขโปรไฟล์">
+                <span class="badge bg-warning text-dark px-3 py-2" id="userRoleBadge">User</span>
+                <span class="text-white small fw-bold cursor-pointer" id="currentUserNameDisplay" onclick="openProfileModal()"></span>
+                <button class="btn btn-outline-light btn-sm ms-2 lang-btn-label" onclick="toggleLanguage()">TH/EN/MM</button>
+                <button class="btn btn-danger btn-sm" onclick="logout()" id="btnLogout">ออกจากระบบ</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Pop-up แก้ไขโปรไฟล์ -->
+<div class="offcanvas offcanvas-end offcanvas-profile" tabindex="-1" id="profileOffcanvas" aria-labelledby="profileOffcanvasLabel">
+    <div class="offcanvas-header card-header-profile text-white">
+        <h5 class="offcanvas-title fw-bold" id="profileTitle"><i class="fa-solid fa-user-gear me-2"></i>แก้ไขข้อมูลส่วนตัว</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-4">
+        <form id="profileForm">
+            <div class="text-center mb-3">
+                <img id="profAvatarPreview" src="" alt="Profile Preview" class="profile-avatar-preview shadow-sm">
+                <div>
+                    <label for="profImageInput" class="btn btn-outline-primary btn-sm rounded-pill" id="lblUploadImage">📷 อัปโหลดรูปโปรไฟล์</label>
+                    <input type="file" id="profImageInput" accept="image/*" class="d-none" onchange="previewProfileImage(event)">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-secondary fw-semibold small" id="lblProfUsername">ชื่อผู้ใช้</label>
+                <input type="text" class="form-control bg-light form-control-sm" id="profUsername" readonly>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-secondary fw-semibold small" id="lblProfFullName">ชื่อ-นามสกุล</label>
+                <input type="text" class="form-control form-control-sm" id="profFullName" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-secondary fw-semibold small" id="lblProfPhone">เบอร์โทรศัพท์</label>
+                <input type="tel" class="form-control form-control-sm" id="profPhone" placeholder="เช่น 0812345678" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-secondary fw-semibold small" id="lblProfDept">แผนก</label>
+                <input type="text" class="form-control form-control-sm" id="profDept" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 fs-6 shadow-sm" id="btnSaveProfile">บันทึกการแก้ไข</button>
+        </form>
+    </div>
+</div>
+
+<!-- 3. Main Content -->
+<div id="mainContent" class="container d-none">
+
+    <!-- 3.1 หน้า Dashboard ลางาน -->
+    <div id="upcomingView" class="page-section active">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-dashboard p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0 fw-bold" id="upcomingTitle">Dashboard ลางาน</h4>
+                    <span class="badge bg-white text-dark px-3 py-2 shadow-sm" id="txtCurrentDateInfo"></span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <!-- แถบปุ่มเลือกสลับ 3 หน้าต่าง -->
+                <div class="d-flex flex-wrap gap-2 mb-4 border-bottom pb-3">
+                    <button type="button" class="btn btn-primary px-3 fw-semibold dash-tab-btn" id="btnDashTabLeave" onclick="switchDashSubTab('leave')">
+                        <i class="fa-solid fa-list-check me-1"></i> <span id="lblDashTabLeave">ตารางลางาน</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary px-3 fw-semibold dash-tab-btn" id="btnDashTabSaturday" onclick="switchDashSubTab('saturday')">
+                        <i class="fa-solid fa-calendar-day me-1"></i> <span id="lblDashTabSaturday">วันหยุดประจำวันเสาร์</span>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary px-3 fw-semibold dash-tab-btn" id="btnDashTabCompany" onclick="switchDashSubTab('company')">
+                        <i class="fa-solid fa-building-flag me-1"></i> <span id="lblDashTabCompany">วันหยุดบริษัทประจำปี</span>
+                    </button>
+                </div>
+
+                <!-- 1. หน้าต่าง: ตารางลางาน -->
+                <div id="dashSubLeave" class="dash-sub-view">
+                    <p class="text-muted small mb-3" id="upcomingDesc">* แสดงเฉพาะรายการที่ยังไม่ถึงกำหนดหรือกำลังอยู่ในช่วงลาเท่านั้น</p>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-custom-header">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;" id="thUpImg">รูป</th>
+                                    <th id="thUpName">พนักงาน</th>
+                                    <th id="thUpType">ประเภท</th>
+                                    <th id="thUpStart">เริ่มวันที่</th>
+                                    <th id="thUpEnd">ถึงวันที่</th>
+                                    <th id="thUpDays" class="text-center">จำนวน (วัน)</th>
+                                    <th id="thUpReason" class="admin-only">เหตุผล</th>
+                                    <th id="thUpStatus">สถานะ</th>
+                                    <th id="thUpAction" class="admin-only">จัดการ (Admin)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upcomingTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. หน้าต่าง: วันหยุดประจำวันเสาร์ (Dashboard ตรงตามกำหนด) -->
+                <div id="dashSubSaturday" class="dash-sub-view d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="fw-bold mb-0 text-primary" id="satTableTitle"><i class="fa-solid fa-calendar-check me-2"></i>รายการวันหยุดประจำวันเสาร์</h5>
+                        <button class="btn btn-success btn-sm shadow-sm admin-only" onclick="goToAddSatHoliday()">
+                            <i class="fa-solid fa-plus me-1"></i> <span id="btnGoAddSat">เพิ่มวันหยุดเสาร์</span>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-custom-header">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">#</th>
+                                    <th id="thSatStartDate">วันที่เริ่ม</th>
+                                    <th id="thSatUser">ชื่อ</th>
+                                    <th id="thSatTitle">รายละเอียดวันหยุด</th>
+                                    <th id="thSatDays" class="text-center">จำนวนวัน</th>
+                                    <th id="thSatAction">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="saturdayTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. หน้าต่าง: วันหยุดบริษัทประจำปี (Dashboard ตรงตามกำหนด) -->
+                <div id="dashSubCompany" class="dash-sub-view d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="fw-bold mb-0 text-primary" id="compTableTitle"><i class="fa-solid fa-hospital-user me-2"></i>รายการวันหยุดบริษัทประจำปี</h5>
+                        <button class="btn btn-success btn-sm shadow-sm admin-only" onclick="goToAddCompHoliday()">
+                            <i class="fa-solid fa-plus me-1"></i> <span id="btnGoAddComp">เพิ่มวันหยุดบริษัท</span>
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-custom-header">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">#</th>
+                                    <th id="thCompStart">วันที่เริ่ม</th>
+                                    <th id="thCompEnd">ถึงวันที่</th>
+                                    <th id="thCompDays" class="text-center">จำนวนวัน</th>
+                                    <th id="thCompTitle">รายละเอียดวันหยุด</th>
+                                    <th id="thCompAction">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.2 หน้าฟอร์มบันทึกข้อมูล -->
+    <div id="requestView" class="page-section">
+        <div class="card shadow-sm mx-auto" style="max-width: 750px;">
+            <div class="card-header card-header-form p-3">
+                <h4 class="mb-0 fw-bold" id="formMainTitle">จัดการบันทึกข้อมูล - WH Pantai</h4>
+            </div>
+            <div class="card-body p-4">
+                <ul class="nav nav-pills nav-justified mb-4" id="formTypeTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-bold" id="tabBtnLeave" onclick="switchFormTab('leave')">
+                            <i class="fa-solid fa-file-pen me-1"></i> <span id="lblTabLeave">ฟอร์มขอลางาน</span>
+                        </button>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <button class="nav-link fw-bold" id="tabBtnSaturday" onclick="switchFormTab('saturday')">
+                            <i class="fa-solid fa-calendar-plus me-1"></i> <span id="lblTabSaturday">บันทึกวันหยุดเสาร์</span>
+                        </button>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <button class="nav-link fw-bold" id="tabBtnCompany" onclick="switchFormTab('company')">
+                            <i class="fa-solid fa-building-circle-check me-1"></i> <span id="lblTabCompany">วันหยุดบริษัทประจำปี</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- ฟอร์ม 1: ฟอร์มขอลางาน -->
+                <div id="formSectionLeave" class="form-section-item">
+                    <div class="text-center mb-4">
+                        <img id="formUserAvatar" src="" alt="User Avatar" class="form-user-avatar shadow-sm">
+                        <span id="editModeBadge" class="badge bg-warning text-dark d-none">กำลังแก้ไขรายการวันลา</span>
+                    </div>
+
+                    <form id="leaveForm">
+                        <input type="hidden" id="editingLeaveId" value="">
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold" id="lblSelectEmp">ผู้ขอลางาน</label>
+                            <input type="text" class="form-control bg-light fw-bold" id="formUserDisplayName" readonly>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblLeaveType">ประเภท</label>
+                                <select class="form-select" id="leaveType" required>
+                                    <option value="sick" id="optSick">ลาป่วย</option>
+                                    <option value="personal" id="optPersonal">ลากิจ</option>
+                                    <option value="vacation" id="optVacation">ลาพักร้อน</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblStartDate">เริ่ม</label>
+                                <input type="text" class="form-control datepicker" id="startDate" placeholder="วัน/เดือน/ปี" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblEndDate">สิ้นสุด</label>
+                                <input type="text" class="form-control datepicker" id="endDate" placeholder="วัน/เดือน/ปี" required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblLeaveDays">จำนวนวันลา</label>
+                                <input type="number" class="form-control" id="leaveDays" min="0.5" step="0.5" placeholder="จำนวนวัน" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold" id="lblReason">เหตุผล</label>
+                            <textarea class="form-control" id="reason" rows="3" required></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1 btn-lg fs-6 shadow-sm" id="btnSubmit">บันทึกการลา</button>
+                            <button type="button" class="btn btn-secondary btn-lg fs-6 shadow-sm d-none" id="btnCancelEdit" onclick="cancelEditMode()">ยกเลิกการแก้ไข</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ฟอร์ม 2: บันทึกวันหยุดประจำวันเสาร์ (ปรับตามข้อกำหนด) -->
+                <div id="formSectionSaturday" class="form-section-item d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-primary mb-0" id="satFormHeaderTitle">แบบฟอร์มบันทึกวันหยุดประจำวันเสาร์</h5>
+                        <span id="editSatBadge" class="badge bg-warning text-dark d-none">กำลังแก้ไขรายการ</span>
+                    </div>
+                    <form id="saturdayForm">
+                        <input type="hidden" id="editingSatId" value="">
+                        
+                        <!-- 3. ชื่อให้อิงตามชื่อ user ของ admin -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold" id="lblSatUser">ชื่อผู้บันทึก (Admin)</label>
+                            <input type="text" class="form-control bg-light fw-bold" id="satUserDisplayName" readonly>
+                        </div>
+
+                        <!-- 1. ใส่วันที่เริ่ม และหยุดถึงวันไหน คำนวณออกมาเป็นจำนวนวัน -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblSatStartDate">เริ่มวันที่</label>
+                                <input type="text" class="form-control datepicker" id="satStartDate" placeholder="วัน/เดือน/ปี" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblSatEndDate">หยุดถึงวันที่</label>
+                                <input type="text" class="form-control datepicker" id="satEndDate" placeholder="วัน/เดือน/ปี" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblSatDays">จำนวนวัน</label>
+                                <input type="number" class="form-control bg-light fw-bold" id="satDays" min="0.5" step="0.5" placeholder="จำนวนวัน" required readonly>
+                            </div>
+                        </div>
+
+                        <!-- 2. รายละเอียดการหยุด -->
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold" id="lblSatTitle">รายละเอียดการหยุด</label>
+                            <textarea class="form-control" id="satTitle" rows="3" placeholder="ระบุรายละเอียดการหยุดเสาร์" required></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success flex-grow-1 btn-lg fs-6 shadow-sm" id="btnSubmitSat">บันทึกวันหยุดเสาร์</button>
+                            <button type="button" class="btn btn-secondary btn-lg fs-6 shadow-sm d-none" id="btnCancelSatEdit" onclick="cancelSatEditMode()">ยกเลิกการแก้ไข</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ฟอร์ม 3: บันทึกวันหยุดบริษัทประจำปี (ปรับตามข้อกำหนด) -->
+                <div id="formSectionCompany" class="form-section-item d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-primary mb-0" id="compFormHeaderTitle">แบบฟอร์มบันทึกวันหยุดบริษัทประจำปี</h5>
+                        <span id="editCompBadge" class="badge bg-warning text-dark d-none">กำลังแก้ไขรายการ</span>
+                    </div>
+                    <form id="companyForm">
+                        <input type="hidden" id="editingCompId" value="">
+
+                        <!-- 1. ใส่วันที่เริ่มและถึงวันที่ พร้อมจำนวนวัน -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblCompStartDate">เริ่มวันที่</label>
+                                <input type="text" class="form-control datepicker" id="compStartDate" placeholder="วัน/เดือน/ปี" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblCompEndDate">ถึงวันที่</label>
+                                <input type="text" class="form-control datepicker" id="compEndDate" placeholder="วัน/เดือน/ปี" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblCompDays">จำนวนวัน</label>
+                                <input type="number" class="form-control bg-light fw-bold" id="compDays" min="0.5" step="0.5" placeholder="จำนวนวัน" required readonly>
+                            </div>
+                        </div>
+
+                        <!-- 2. รายละเอียดวันหยุด -->
+                        <div class="mb-4">
+                            <label class="form-label text-secondary fw-semibold" id="lblCompTitle">รายละเอียดวันหยุด</label>
+                            <textarea class="form-control" id="compTitle" rows="3" placeholder="ระบุรายละเอียดวันหยุดบริษัทประจำปี" required></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-purple text-white flex-grow-1 btn-lg fs-6 shadow-sm" style="background-color: #7c3aed;" id="btnSubmitComp">บันทึกวันหยุดบริษัท</button>
+                            <button type="button" class="btn btn-secondary btn-lg fs-6 shadow-sm d-none" id="btnCancelCompEdit" onclick="cancelCompEditMode()">ยกเลิกการแก้ไข</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.3 หน้าสรุปการลาของฉัน -->
+    <div id="mySummaryView" class="page-section">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header card-header-summary p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0 fw-bold" id="mySummaryTitle">สรุปสถิติการลาของฉัน</h4>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-white fw-bold me-1 mb-0" id="lblYearText"><i class="fa-solid fa-calendar-days"></i> ปี:</label>
+                            <select id="userYearSelect" class="form-select form-select-sm fw-bold border-0 shadow-sm" style="width: 100px;" onchange="loadLeaves()">
+                                <option value="2026" selected>2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 bg-white text-dark px-3 py-1-5 rounded-pill shadow-sm">
+                            <img id="mySummaryUserAvatar" src="" alt="Avatar" class="profile-header-avatar">
+                            <span class="fs-5 fw-bold text-purple px-1" id="mySummaryUserDisplay"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-2">
+                        <div class="card stat-card bg-danger p-3 shadow-sm text-center">
+                            <h6 id="statMySick" class="opacity-75">ลาป่วย (ใช้ไป/โควต้า)</h6>
+                            <h2 class="mb-0 fw-bold"><span id="countMySick">0</span> <small class="fs-6" id="txtDayUnit2">วัน</small></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="card stat-card bg-warning text-dark p-3 shadow-sm text-center">
+                            <h6 id="statMyPersonal" class="opacity-75">ลากิจ (ใช้ไป/โควต้า)</h6>
+                            <h2 class="mb-0 fw-bold"><span id="countMyPersonal">0</span> <small class="fs-6" id="txtDayUnit3">วัน</small></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <div class="card stat-card bg-success p-3 shadow-sm text-center">
+                            <h6 id="statMyVacation" class="opacity-75">ลาพักร้อน (ใช้ไป/โควต้า)</h6>
+                            <h2 class="mb-0 fw-bold"><span id="countMyVacation">0</span> <small class="fs-6" id="txtDayUnit4">วัน</small></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3 text-secondary" id="myHistoryTitle">ประวัติการลาของคุณ</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-custom-header">
+                        <thead>
+                            <tr>
+                                <th id="thMyType">ประเภท</th>
+                                <th id="thMyStart">เริ่มวันที่</th>
+                                <th id="thMyEnd">ถึงวันที่</th>
+                                <th id="thMyDays" class="text-center">จำนวน (วัน)</th>
+                                <th id="thMyReason">เหตุผล</th>
+                                <th id="thMyStatus">สถานะ</th>
+                                <th id="thMyActions">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="myHistoryTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.4 หน้า Dashboard ภาพรวม Admin -->
+    <div id="dashboardView" class="page-section">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header card-header-admin p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0 fw-bold" id="dashTitle">แดชบอร์ดภาพรวม (WH Pantai)</h4>
+                    <div class="d-flex gap-2">
+                        <select id="adminEmpFilter" class="form-select form-select-sm fw-bold border-0 shadow-sm" style="min-width: 180px;" onchange="loadLeaves()">
+                        </select>
+                        <select id="adminYearSelect" class="form-select form-select-sm fw-bold border-0 shadow-sm" style="width: 110px;" onchange="loadLeaves()">
+                            <option value="ALL">ทุกปี</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stat-card bg-primary p-3 shadow-sm text-center">
+                            <h5 id="statTotalLeaves" class="opacity-75">การลาทั้งหมด</h5>
+                            <h2 id="countTotal" class="fw-bold mb-0">0 <small class="fs-6" id="txtCountUnit">ครั้ง</small></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card bg-danger p-3 shadow-sm text-center">
+                            <h5 id="statSickLeaves" class="opacity-75">ลาป่วย (ใช้/โควต้า)</h5>
+                            <h2 id="countSick" class="fw-bold mb-0">0 <small class="fs-6" id="txtDayUnit5">วัน</small></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card bg-warning text-dark p-3 shadow-sm text-center">
+                            <h5 id="statPersonalLeaves" class="opacity-75">ลากิจ (ใช้/โควต้า)</h5>
+                            <h2 id="countPersonal" class="fw-bold mb-0">0 <small class="fs-6" id="txtDayUnit7">วัน</small></h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card bg-success p-3 shadow-sm text-center">
+                            <h5 id="statVacation" class="opacity-75">ลาพักร้อน (ใช้/โควต้า)</h5>
+                            <h2 id="countVacation" class="fw-bold mb-0">0 <small class="fs-6" id="txtDayUnit6">วัน</small></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3 text-secondary" id="tableTitle">ประวัติการลาทั้งหมด</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle table-custom-header">
+                        <thead>
+                            <tr>
+                                <th id="thName">พนักงาน</th>
+                                <th id="thType">ประเภท</th>
+                                <th id="thStart">เริ่ม</th>
+                                <th id="thEnd">สิ้นสุด</th>
+                                <th id="thAmount" class="text-center">จำนวน</th>
+                                <th id="thReason">เหตุผล</th>
+                                <th id="thStatus">สถานะ</th>
+                                <th id="thAction">จัดการ (Admin)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaveTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3.5 หน้าจัดการพนักงาน -->
+    <div id="employeeView" class="page-section">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header card-header-emp p-3">
+                        <h5 class="mb-0 fw-bold" id="empFormTitle">เพิ่มพนักงานใหม่</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="empForm">
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblEmpName">ชื่อ-นามสกุล</label>
+                                <input type="text" class="form-control" id="newEmpName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblEmpPhone">เบอร์โทรศัพท์</label>
+                                <input type="tel" class="form-control" id="newEmpPhone" placeholder="เช่น 0812345678" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary fw-semibold" id="lblEmpDept">แผนก</label>
+                                <input type="text" class="form-control" id="newEmpDept" required>
+                            </div>
+                            <button type="submit" class="btn btn-info text-white w-100 shadow-sm" id="btnAddEmp">เพิ่มพนักงาน</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header card-header-emp p-3">
+                        <h5 class="mb-0 fw-bold" id="empTableTitle">รายชื่อพนักงาน</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle table-custom-header">
+                                <thead>
+                                    <tr>
+                                        <th id="thEmpName">ชื่อ</th>
+                                        <th id="thEmpUser">Username</th>
+                                        <th id="thEmpPhone">เบอร์โทรศัพท์</th>
+                                        <th id="thEmpQuota">โควต้าวันลา (ป่วย/กิจ/พักร้อน)</th>
+                                        <th id="thEmpRole">สิทธิ์ใช้งาน</th>
+                                        <th id="thEmpAction">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    const GOOGLE_SCRIPT_URL = "วาง_WEB_APP_URL_ที่นี่";
+
+    let profileOffcanvasInstance = null;
+
+    function openProfileModal() {
+        if (!profileOffcanvasInstance) {
+            profileOffcanvasInstance = new bootstrap.Offcanvas(document.getElementById('profileOffcanvas'));
+        }
+        profileOffcanvasInstance.show();
+    }
+
+    function closeProfileModal() {
+        if (profileOffcanvasInstance) {
+            profileOffcanvasInstance.hide();
+        }
+    }
+
+    function formatPhoneNumber(phone) {
+        if (!phone) return '-';
+        let strPhone = String(phone).trim();
+        if (strPhone !== '' && !strPhone.startsWith('0') && strPhone.length <= 9) {
+            strPhone = strPhone.padStart(10, '0');
+        }
+        return strPhone;
+    }
+
+    function parseDateToISO(dateStr) {
+        if (!dateStr) return '';
+        let str = String(dateStr).trim();
+        
+        if (str.includes('T')) {
+            const d = new Date(str);
+            if (!isNaN(d.getTime())) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+        }
+        if (str.includes('/')) {
+            const parts = str.split('/');
+            if (parts.length === 3) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return str;
+    }
+
+    function formatDateDisplay(dateStr) {
+        if (!dateStr) return '';
+        let str = String(dateStr).trim();
+        
+        if (str.includes('T')) {
+            const d = new Date(str);
+            if (!isNaN(d.getTime())) {
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                return `${day}/${month}/${year}`;
+            }
+        }
+
+        if (str.includes('-')) {
+            const parts = str.split('-');
+            if (parts.length >= 3) return `${parts[2].substring(0, 2).padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+        }
+        return str;
+    }
+
+    function getLeaveTypeBadge(type, label) {
+        if (type === 'sick') {
+            return `<span class="badge bg-danger px-2 py-1"><i class="fa-solid fa-notes-medical me-1"></i>${label}</span>`;
+        } else if (type === 'personal') {
+            return `<span class="badge bg-warning text-dark px-2 py-1"><i class="fa-solid fa-user-clock me-1"></i>${label}</span>`;
+        } else if (type === 'vacation') {
+            return `<span class="badge bg-success px-2 py-1"><i class="fa-solid fa-umbrella-beach me-1"></i>${label}</span>`;
+        }
+        return `<span class="badge bg-secondary px-2 py-1">${label}</span>`;
+    }
+
+    function showSyncSpinner(show) {
+        const spinner = document.getElementById('syncIndicator');
+        if (spinner) spinner.style.display = show ? 'inline-block' : 'none';
+    }
+
+    // 1. ดึงข้อมูลจาก Cloud
+    async function fetchCloudData() {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("วาง_WEB_APP_URL")) return;
+        showSyncSpinner(true);
+        try {
+            const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getInitialData`);
+            const data = await res.json();
+
+            if (data) {
+                if (data.leaves && Array.isArray(data.leaves)) {
+                    data.leaves.forEach(serverItem => {
+                        serverItem.startDate = parseDateToISO(serverItem.startDate);
+                        serverItem.endDate = parseDateToISO(serverItem.endDate);
+                        if (serverItem.customDays !== undefined && serverItem.customDays !== null && serverItem.customDays !== '') {
+                            serverItem.customDays = parseFloat(serverItem.customDays);
+                        }
+                    });
+                    localStorage.setItem('leaveData', JSON.stringify(data.leaves));
+                }
+
+                if (data.saturdayHolidays && Array.isArray(data.saturdayHolidays)) {
+                    data.saturdayHolidays.forEach(item => { 
+                        if (item.startDate) item.startDate = parseDateToISO(item.startDate);
+                        if (item.endDate) item.endDate = parseDateToISO(item.endDate);
+                        if (item.date) item.date = parseDateToISO(item.date);
+                    });
+                    localStorage.setItem('saturdayHolidays', JSON.stringify(data.saturdayHolidays));
+                }
+
+                if (data.companyHolidays && Array.isArray(data.companyHolidays)) {
+                    data.companyHolidays.forEach(item => {
+                        item.startDate = parseDateToISO(item.startDate);
+                        item.endDate = parseDateToISO(item.endDate);
+                    });
+                    localStorage.setItem('companyHolidays', JSON.stringify(data.companyHolidays));
+                }
+
+                if (data.users && Array.isArray(data.users)) {
+                    let formattedUsers = data.users.map(serverUser => ({
+                        ...serverUser,
+                        username: String(serverUser.username || '').trim(),
+                        password: String(serverUser.password || '').trim(),
+                        fullName: String(serverUser.fullName || '').trim(),
+                        phone: formatPhoneNumber(serverUser.phone),
+                        dept: String(serverUser.dept || '').trim(),
+                        role: String(serverUser.role || 'user').trim().toLowerCase(),
+                        avatar: serverUser.avatar || defaultAvatar
+                    }));
+                    localStorage.setItem('users', JSON.stringify(formattedUsers));
+                }
+
+                if (data.employees && Array.isArray(data.employees)) {
+                    let formattedEmps = data.employees.map(serverEmp => {
+                        if (typeof serverEmp.quota === 'string' && serverEmp.quota.trim() !== '') {
+                            try { serverEmp.quota = JSON.parse(serverEmp.quota); } catch(err){ serverEmp.quota = null; }
+                        }
+                        if (!serverEmp.quota || typeof serverEmp.quota !== 'object') {
+                            serverEmp.quota = { sick: 30, personal: 6, vacation: 7 };
+                        } else {
+                            serverEmp.quota = {
+                                sick: parseInt(serverEmp.quota.sick) || 0,
+                                personal: parseInt(serverEmp.quota.personal) || 0,
+                                vacation: parseInt(serverEmp.quota.vacation) || 0
+                            };
+                        }
+                        serverEmp.phone = formatPhoneNumber(serverEmp.phone);
+                        return serverEmp;
+                    });
+                    localStorage.setItem('employees', JSON.stringify(formattedEmps));
+                }
+
+                loadEmployees();
+                loadLeaves();
+            }
+        } catch (e) {
+            console.error("Fetch Cloud Error:", e);
+        } finally {
+            showSyncSpinner(false);
+        }
+    }
+
+    // 2. ส่งข้อมูลขึ้น Cloud
+    async function syncToCloud() {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("วาง_WEB_APP_URL")) return;
+        showSyncSpinner(true);
+        try {
+            const leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+            const saturdayHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
+            const companyHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
+            const employees = JSON.parse(localStorage.getItem('employees')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'syncData', leaves, saturdayHolidays, companyHolidays, employees, users })
+            });
+        } catch (e) {
+            console.error("Cloud Sync Error:", e);
+        } finally {
+            showSyncSpinner(false);
+        }
+    }
+
+    function playAudioNotification(type) {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+
+            if (type === 'success') {
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime);
+                gain1.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(ctx.currentTime);
+                osc1.stop(ctx.currentTime + 0.1);
+
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12);
+                gain2.gain.setValueAtTime(0.1, ctx.currentTime + 0.12);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(ctx.currentTime + 0.12);
+                osc2.stop(ctx.currentTime + 0.25);
+            } else if (type === 'error') {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+            }
+        } catch (e) {
+            console.log("Audio Notification Error:", e);
+        }
+    }
+
+    const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%236c757d'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/></svg>";
+
+    const translations = {
+        th: {
+            loginTitle: "เข้าสู่ระบบ", lblUsername: "ชื่อผู้ใช้", lblPassword: "รหัสผ่าน", btnLogin: "เข้าสู่ระบบ", txtNoAccount: "ยังไม่มีบัญชี?", linkGoRegister: "สมัครสมาชิก",
+            regTitle: "สมัครสมาชิกพนักงาน", lblRegFullName: "ชื่อ-นามสกุล", lblRegPhone: "เบอร์โทรศัพท์", lblRegDept: "แผนก", lblRegUser: "ชื่อผู้ใช้", lblRegPass: "รหัสผ่าน", btnRegister: "ลงทะเบียน", txtHaveAccount: "มีบัญชีอยู่แล้ว?", linkGoLogin: "เข้าสู่ระบบ", btnLogout: "ออกจากระบบ",
+            navTitle: "ระบบลางาน WH Pantai", menuUpcoming: "Dashboard ลางาน", menuRequest: "ฟอร์มบันทึกข้อมูล", menuMySummary: "สรุปการลาของฉัน", menuDashboard: "แดชบอร์ด & ประวัติ", menuEmployee: "จัดการพนักงาน",
+            formMainTitle: "จัดการบันทึกข้อมูล - WH Pantai", lblTabLeave: "ฟอร์มขอลางาน", lblTabSaturday: "บันทึกวันหยุดเสาร์", lblTabCompany: "วันหยุดบริษัทประจำปี",
+            lblSelectEmp: "ผู้ขอลางาน", lblLeaveType: "ประเภทการลา", optSick: "ลาป่วย", optPersonal: "ลากิจ", optVacation: "ลาพักร้อน",
+            lblStartDate: "เริ่มวันที่", lblEndDate: "ถึงวันที่", lblLeaveDays: "จำนวนวันลา", lblReason: "เหตุผล", btnSubmit: "บันทึกการลา",
+            satFormHeaderTitle: "แบบฟอร์มบันทึกวันหยุดประจำวันเสาร์", lblSatStartDate: "เริ่มวันที่", lblSatEndDate: "หยุดถึงวันที่", lblSatDays: "จำนวนวัน", lblSatTitle: "รายละเอียดการหยุด", lblSatUser: "ชื่อผู้บันทึก (Admin)", btnSubmitSat: "บันทึกวันหยุดเสาร์",
+            compFormHeaderTitle: "แบบฟอร์มบันทึกวันหยุดบริษัทประจำปี", lblCompTitle: "รายละเอียดวันหยุด", lblCompStartDate: "เริ่มวันที่", lblCompEndDate: "ถึงวันที่", lblCompDays: "จำนวนวัน", btnSubmitComp: "บันทึกวันหยุดบริษัท",
+            mySummaryTitle: "สรุปสถิติการลาของฉัน", statMySick: "ลาป่วย", statMyPersonal: "ลากิจ", statMyVacation: "ลาพักร้อน",
+            myHistoryTitle: "ประวัติการลาของคุณ", thMyType: "ประเภท", thMyStart: "เริ่มวันที่", thMyEnd: "ถึงวันที่", thMyDays: "จำนวน (วัน)", thMyReason: "เหตุผล", thMyStatus: "สถานะ", thMyActions: "จัดการ",
+            profileTitle: "แก้ไขข้อมูลส่วนตัว", lblProfUsername: "ชื่อผู้ใช้", lblProfFullName: "ชื่อ-นามสกุล", lblProfPhone: "เบอร์โทรศัพท์", lblProfDept: "แผนก", btnSaveProfile: "บันทึกการแก้ไข", lblUploadImage: "📷 อัปโหลดรูปโปรไฟล์",
+            upcomingTitle: "Dashboard ลางาน", upcomingDesc: "* แสดงเฉพาะรายการที่ยังไม่ถึงกำหนดหรือกำลังอยู่ในช่วงลาเท่านั้น",
+            lblDashTabLeave: "ตารางลางาน", lblDashTabSaturday: "วันหยุดประจำวันเสาร์", lblDashTabCompany: "วันหยุดบริษัทประจำปี", btnGoAddSat: "เพิ่มวันหยุดเสาร์", btnGoAddComp: "เพิ่มวันหยุดบริษัท",
+            thUpImg: "รูป", thUpName: "พนักงาน", thUpType: "ประเภท", thUpStart: "เริ่มวันที่", thUpEnd: "ถึงวันที่", thUpDays: "จำนวน (วัน)", thUpReason: "เหตุผล", thUpStatus: "สถานะ", thUpAction: "จัดการ (Admin)",
+            thSatStartDate: "วันที่เริ่ม", thSatUser: "ชื่อ", thSatTitle: "รายละเอียดวันหยุด", thSatDays: "จำนวนวัน", thSatAction: "จัดการ",
+            thCompStart: "วันที่เริ่ม", thCompEnd: "ถึงวันที่", thCompDays: "จำนวนวัน", thCompTitle: "รายละเอียดวันหยุด", thCompAction: "จัดการ",
+            dashTitle: "แดชบอร์ดภาพรวม (WH Pantai)", statTotalLeaves: "การลาทั้งหมด", statSickLeaves: "ลาป่วยรวม", statVacation: "ลาพักร้อนรวม",
+            tableTitle: "ประวัติการลาทั้งหมด", thName: "พนักงาน", thType: "ประเภท", thStart: "เริ่ม", thEnd: "สิ้นสุด", thAmount: "จำนวน", thReason: "เหตุผล", thStatus: "สถานะ", thAction: "จัดการ (Admin)",
+            empFormTitle: "เพิ่มพนักงานใหม่", lblEmpName: "ชื่อ-นามสกุล", lblEmpUser: "Username", lblEmpPhone: "เบอร์โทรศัพท์", lblEmpDept: "แผนก", btnAddEmp: "เพิ่มพนักงาน",
+            empTableTitle: "รายชื่อพนักงาน", thEmpName: "ชื่อ", thEmpPhone: "เบอร์โทรศัพท์", thEmpDept: "แผนก", thEmpRole: "สิทธิ์ใช้งาน", thEmpAction: "จัดการ", deleteBtn: "ลบ", editBtn: "แก้ไข", cancelBtn: "ยกเลิก", resetPassBtn: "🔑 รีเซ็ต", setQuotaBtn: "⚙️ โควต้า", approveBtn: "✅ อนุมัติ", pendingStatus: "⏳ รออนุมัติ", approvedStatus: "🟢 อนุมัติแล้ว",
+            txtDayUnit: "วัน", txtCountUnit: "ครั้ง", noLeavesMsg: "ไม่มีรายการวันลาที่กำลังจะถึงในขณะนี้", noHistoryMsg: "ไม่พบประวัติการลาในปีนี้"
+        },
+        en: {
+            loginTitle: "Login", lblUsername: "Username", lblPassword: "Password", btnLogin: "Login", txtNoAccount: "Don't have an account?", linkGoRegister: "Register",
+            regTitle: "Employee Registration", lblRegFullName: "Full Name", lblRegPhone: "Phone Number", lblRegDept: "Department", lblRegUser: "Username", lblRegPass: "Password", btnRegister: "Sign Up", txtHaveAccount: "Already have an account?", linkGoLogin: "Login", btnLogout: "Logout",
+            navTitle: "WH Pantai Leave System", menuUpcoming: "Leave Dashboard", menuRequest: "Forms & Entry", menuMySummary: "My Summary", menuDashboard: "Dashboard & History", menuEmployee: "Employees",
+            formMainTitle: "Data Entry - WH Pantai", lblTabLeave: "Leave Form", lblTabSaturday: "Saturday Holiday Entry", lblTabCompany: "Company Holiday Entry",
+            lblSelectEmp: "Applicant Name", lblLeaveType: "Leave Type", optSick: "Sick Leave", optPersonal: "Personal Leave", optVacation: "Annual Leave",
+            lblStartDate: "Start Date", lblEndDate: "End Date", lblLeaveDays: "Leave Days", lblReason: "Reason", btnSubmit: "Submit Leave",
+            satFormHeaderTitle: "Saturday Holiday Form", lblSatStartDate: "Start Date", lblSatEndDate: "End Date", lblSatDays: "Days", lblSatTitle: "Holiday Details", lblSatUser: "Recorded By (Admin)", btnSubmitSat: "Save Saturday Holiday",
+            compFormHeaderTitle: "Company Annual Holiday Form", lblCompTitle: "Holiday Details", lblCompStartDate: "Start Date", lblCompEndDate: "End Date", lblCompDays: "Days", btnSubmitComp: "Save Company Holiday",
+            mySummaryTitle: "My Leave Summary", statMySick: "Sick Leave", statMyPersonal: "Personal Leave", statMyVacation: "Annual Leave",
+            myHistoryTitle: "Your Leave History", thMyType: "Type", thMyStart: "Start Date", thMyEnd: "End Date", thMyDays: "Days", thMyReason: "Reason", thMyStatus: "Status", thMyActions: "Action",
+            profileTitle: "Edit Profile", lblProfUsername: "Username", lblProfFullName: "Full Name", lblProfPhone: "Phone Number", lblProfDept: "Department", btnSaveProfile: "Save Changes", lblUploadImage: "📷 Upload Photo",
+            upcomingTitle: "Leave Dashboard", upcomingDesc: "* Shows active/future leave requests only",
+            lblDashTabLeave: "Leave Table", lblDashTabSaturday: "Saturday Holidays", lblDashTabCompany: "Company Annual Holidays", btnGoAddSat: "Add Saturday Holiday", btnGoAddComp: "Add Company Holiday",
+            thUpImg: "Photo", thUpName: "Employee", thUpType: "Type", thUpStart: "Start Date", thUpEnd: "End Date", thUpDays: "Days", thUpReason: "Reason", thUpStatus: "Status", thUpAction: "Action (Admin)",
+            thSatStartDate: "Start Date", thSatUser: "Name", thSatTitle: "Holiday Details", thSatDays: "Days", thSatAction: "Action",
+            thCompStart: "Start Date", thCompEnd: "End Date", thCompDays: "Days", thCompTitle: "Holiday Details", thCompAction: "Action",
+            dashTitle: "WH Pantai Overview Dashboard", statTotalLeaves: "Total Leaves", statSickLeaves: "Total Sick Leave", statVacation: "Total Vacation",
+            tableTitle: "All Leave History", thName: "Employee", thType: "Type", thStart: "Start", thEnd: "End", thAmount: "Amount", thReason: "Reason", thStatus: "Status", thAction: "Action (Admin)",
+            empFormTitle: "Add New Employee", lblEmpName: "Full Name", lblEmpUser: "Username", lblEmpPhone: "Phone Number", lblEmpDept: "Department", btnAddEmp: "Add Employee",
+            empTableTitle: "Employee Directory", thEmpName: "Name", thEmpPhone: "Phone", thEmpDept: "Department", thEmpRole: "Role", thEmpAction: "Action", deleteBtn: "Delete", editBtn: "Edit", cancelBtn: "Cancel", resetPassBtn: "🔑 Reset", setQuotaBtn: "⚙️ Quotas", approveBtn: "✅ Approve", pendingStatus: "⏳ Pending", approvedStatus: "🟢 Approved",
+            txtDayUnit: "Days", txtCountUnit: "Times", noLeavesMsg: "No upcoming leave requests found.", noHistoryMsg: "No leave history found for this year."
+        },
+        mm: {
+            loginTitle: "အကောင့်ဝင်ရန်", lblUsername: "အသုံးပြုသူအမည်", lblPassword: "စကားဝှက်", btnLogin: "ဝင်ရောက်မည်", txtNoAccount: "အကောင့်မရှိသေးပါလား?", linkGoRegister: "အကောင့်ဖွင့်ရန်",
+            regTitle: "ဝန်ထမ်းအကောင့်ဖွင့်ရန်", lblRegFullName: "အမည်အပြည့်အစုံ", lblRegPhone: "ဖုန်းနံပါတ်", lblRegDept: "ဌာန", lblRegUser: "အသုံးပြုသူအမည်", lblRegPass: "စကားဝှက်", btnRegister: "စာရင်းသွင်းမည်", txtHaveAccount: "အကောင့်ရှိပြီးသားလား?", linkGoLogin: "အကောင့်ဝင်ရန်", btnLogout: "ထွက်မည်",
+            navTitle: "WH Pantai ခွင့်ယူစနစ်", menuUpcoming: "ခွင့်ယူမှု ဒက်ရှ်ဘုတ်", menuRequest: "ဖောင်တိုင်ကြားရန်", menuMySummary: "ကျွန်ုပ်၏ ခွင့်အကျဉ်း", menuDashboard: "ဒက်ရှ်ဘုတ်နှင့် မှတ်တမ်း", menuEmployee: "ဝန်ထမ်းများ စီမံရန်",
+            formMainTitle: "အချက်အလက် စီမံရန် - WH Pantai", lblTabLeave: "ခွင့်တိုင်ကြားလွှာ", lblTabSaturday: "စနေ ရုံးပိတ်ရက် စာရင်း", lblTabCompany: "ကုမ္ပဏီ ရုံးပိတ်ရက် စာရင်း",
+            lblSelectEmp: "ခွင့်တိုင်ကြားသူ", lblLeaveType: "ခွင့်အမျိုးအစား", optSick: "ဆေးခွင့်", optPersonal: "ရှောင်တခင်ခွင့်", optVacation: "လုပ်သက်ခွင့်",
+            lblStartDate: "စတင်သည့်ရက်", lblEndDate: "ပြီးဆုံးသည့်ရက်", lblLeaveDays: "ခွင့်ရက်ပေါင်း", lblReason: "အကြောင်းပြချက်", btnSubmit: "ခွင့်တိုင်ကြားမည်",
+            satFormHeaderTitle: "စနေနေ့ ရုံးပိတ်ရက် တောင်းဆိုလွှာ", lblSatStartDate: "စတင်သည့်ရက်", lblSatEndDate: "ပြီးဆုံးသည့်ရက်", lblSatDays: "ရက်ပေါင်း", lblSatTitle: "အကြောင်းအရာ", lblSatUser: "ရေးသွင်းသူ (Admin)", btnSubmitSat: "စနေ ရုံးပိတ်ရက် သိမ်းဆည်းမည်",
+            compFormHeaderTitle: "ကုမ္ပဏီ နှစ်စဉ် ရုံးပိတ်ရက် တောင်းဆိုလွှာ", lblCompTitle: "အကြောင်းအရာ", lblCompStartDate: "စတင်သည့်ရက်", lblCompEndDate: "ပြီးဆုံးသည့်ရက်", lblCompDays: "ရက်ပေါင်း", btnSubmitComp: "ကုမ္ပဏီ ရုံးပိတ်ရက် သိမ်းဆည်းမည်",
+            mySummaryTitle: "ကျွန်ုပ်၏ ခွင့်ယူမှု အကျဉ်းချုပ်", statMySick: "ဆေးခွင့်", statMyPersonal: "ရှောင်တခင်ခွင့်", statMyVacation: "လုပ်သက်ခွင့်",
+            myHistoryTitle: "သင်၏ ခွင့်ယူမှု မှတ်တမ်း", thMyType: "အမျိုးအစား", thMyStart: "စတင်ရက်", thMyEnd: "ပြီးဆုံးရက်", thMyDays: "ရက်ပေါင်း", thMyReason: "အကြောင်းပြချက်", thMyStatus: "အခြေအနေ", thMyActions: "လုပ်ဆောင်ချက်",
+            profileTitle: "ကိုယ်ရေးအချက်အလက် ပြင်ရန်", lblProfUsername: "အသုံးပြုသူအမည်", lblProfFullName: "အမည်အပြည့်အစုံ", lblProfPhone: "ဖုန်းနံပါတ်", lblProfDept: "ဌာန", btnSaveProfile: "သိမ်းဆည်းမည်", lblUploadImage: "📷 ဓာတ်ပုံတင်မည်",
+            upcomingTitle: "ခွင့်ယူမှု ဒက်ရှ်ဘုတ်", upcomingDesc: "* လာမည့် သို့မဟုတ် လက်ရှိ ခွင့်ယူထားသည်များကိုသာ ပြသထားသည်",
+            lblDashTabLeave: "ခွင့်ယူမှု ဇယား", lblDashTabSaturday: "စနေနေ့ ရုံးပိတ်ရက်များ", lblDashTabCompany: "ကုမ္ပဏီ နှစ်စဉ် ရုံးပိတ်ရက်များ", btnGoAddSat: "စနေ ရုံးပိတ်ရက် ထည့်ရန်", btnGoAddComp: "ကုမ္ပဏီ ရုံးပိတ်ရက် ထည့်ရန်",
+            thUpImg: "ပုံ", thUpName: "ဝန်ထမ်း", thUpType: "အမျိုးအစား", thUpStart: "စတင်ရက်", thUpEnd: "ပြီးဆုံးရက်", thUpDays: "ရက်ပေါင်း", thUpReason: "အကြောင်းပြချက်", thUpStatus: "အခြေအနေ", thUpAction: "လုပ်ဆောင်ချက် (Admin)",
+            thSatStartDate: "စတင်ရက်", thSatUser: "အမည်", thSatTitle: "အကြောင်းအရာ", thSatDays: "ရက်ပေါင်း", thSatAction: "လုပ်ဆောင်ချက်",
+            thCompStart: "စတင်ရက်", thCompEnd: "ပြီးဆုံးရက်", thCompDays: "ရက်ပေါင်း", thCompTitle: "အကြောင်းအရာ", thCompAction: "လုပ်ဆောင်ချက်",
+            dashTitle: "WH Pantai အထွေထွေ ဒက်ရှ်ဘုတ်", statTotalLeaves: "စုစုပေါင်း ခွင့်ယူမှု", statSickLeaves: "စုစုပေါင်း ဆေးခွင့်", statVacation: "စုစုပေါင်း လုပ်သက်ခွင့်",
+            tableTitle: "ခွင့်ယူမှု မှတ်တမ်းအားလုံး", thName: "ဝန်ထမ်း", thType: "အမျိုးအစား", thStart: "စတင်ရက်", thEnd: "ပြီးဆုံးရက်", thAmount: "အရေအတွက်", thReason: "အကြောင်းပြချက်", thStatus: "အခြေအနေ", thAction: "လုပ်ဆောင်ချက် (Admin)",
+            empFormTitle: "ဝန်ထမ်းသစ်ထည့်ရန်", lblEmpName: "အမည်အပြည့်အစုံ", lblEmpUser: "Username", lblEmpPhone: "ဖုန်းနံပါတ်", lblEmpDept: "ဌာန", btnAddEmp: "ဝန်ထမ်းထည့်မည်",
+            empTableTitle: "ဝန်ထမ်းစာရင်း", thEmpName: "အမည်", thEmpPhone: "ဖုန်းနံပါတ်", thEmpDept: "ဌာန", thEmpRole: "ရာထူး/စနစ်", thEmpAction: "လုပ်ဆောင်ချက်", deleteBtn: "ဖျက်မည်", editBtn: "ပြင်မည်", cancelBtn: "ပယ်ဖျက်မည်", resetPassBtn: "🔑 စကားဝှက်ပြင်မည်", setQuotaBtn: "⚙️ ခွင့်โတွတာ", approveBtn: "✅ အတည်ပြုမည်", pendingStatus: "⏳ စောင့်ဆိုင်းဆဲ", approvedStatus: "🟢 ခွင့်ပြုပြီး",
+            txtDayUnit: "ရက်", txtCountUnit: "ကြိမ်", noLeavesMsg: "လာမည့် ခွင့်ယူမှုများ မရှိသေးပါ", noHistoryMsg: "ဒီနှစ်အတွက် ခွင့်ယူမှု မှတ်တမ်း မရှိသေးပါ"
+        }
+    };
+
+    let currentLang = 'th';
+    let currentUser = null;
+    let tempAvatarBase64 = null;
+
+    // Date Pickers
+    let startPicker = flatpickr("#startDate", { dateFormat: "d/m/Y", allowInput: true, onChange: function() { autoCalculateLeaveDays(); } });
+    let endPicker = flatpickr("#endDate", { dateFormat: "d/m/Y", allowInput: true, onChange: function() { autoCalculateLeaveDays(); } });
+
+    // วันหยุดเสาร์ Date Pickers
+    let satStartPicker = flatpickr("#satStartDate", { dateFormat: "d/m/Y", allowInput: true, onChange: function() { autoCalculateSatDays(); } });
+    let satEndPicker = flatpickr("#satEndDate", { dateFormat: "d/m/Y", allowInput: true, onChange: function() { autoCalculateSatDays(); } });
+
+    // วันหยุดบริษัท Date Pickers
+    let compStartPicker = flatpickr("#compStartDate", { dateFormat: "d/m/Y", allowInput: true, onChange: function() { autoCalculateCompDays(); } });
+    let compEndPicker = flatpickr("#compEndDate", { dateFormat: "d/m/Y", allowInput: true, onChange: function() { autoCalculateCompDays(); } });
+
+    function calculateDays(startDateStr, endDateStr) {
+        if (!startDateStr || !endDateStr) return 0;
+        const start = new Date(parseDateToISO(startDateStr));
+        const end = new Date(parseDateToISO(endDateStr));
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        return diffDays > 0 ? diffDays : 0;
+    }
+
+    function getLeaveDaysVal(leave) {
+        if (leave.customDays !== undefined && leave.customDays !== null && leave.customDays !== '' && !isNaN(leave.customDays)) {
+            return parseFloat(leave.customDays);
+        }
+        return calculateDays(leave.startDate, leave.endDate);
+    }
+
+    function autoCalculateLeaveDays() {
+        const startVal = document.getElementById('startDate').value;
+        const endVal = document.getElementById('endDate').value;
+        if (startVal && endVal) {
+            const calculated = calculateDays(startVal, endVal);
+            if (calculated > 0) document.getElementById('leaveDays').value = calculated;
+        }
+    }
+
+    function autoCalculateSatDays() {
+        const startVal = document.getElementById('satStartDate').value;
+        const endVal = document.getElementById('satEndDate').value;
+        if (startVal && endVal) {
+            const calculated = calculateDays(startVal, endVal);
+            if (calculated > 0) document.getElementById('satDays').value = calculated;
+        }
+    }
+
+    function autoCalculateCompDays() {
+        const startVal = document.getElementById('compStartDate').value;
+        const endVal = document.getElementById('compEndDate').value;
+        if (startVal && endVal) {
+            const calculated = calculateDays(startVal, endVal);
+            if (calculated > 0) document.getElementById('compDays').value = calculated;
+        }
+    }
+
+    function toggleLanguage() {
+        if (currentLang === 'th') currentLang = 'en';
+        else if (currentLang === 'en') currentLang = 'mm';
+        else currentLang = 'th';
+
+        const lang = translations[currentLang];
+        Object.keys(lang).forEach(key => {
+            if(document.getElementById(key)) document.getElementById(key).innerText = lang[key];
+        });
+
+        document.querySelectorAll('.lang-btn-label').forEach(btn => {
+            btn.innerText = currentLang.toUpperCase() + ' (TH/EN/MM)';
+        });
+
+        document.querySelectorAll('[id^="txtDayUnit"]').forEach(el => el.innerText = lang.txtDayUnit);
+        if (document.getElementById('txtCountUnit')) document.getElementById('txtCountUnit').innerText = lang.txtCountUnit;
+
+        loadEmployees();
+        loadLeaves();
+    }
+
+    function switchDashSubTab(tabName) {
+        document.querySelectorAll('.dash-sub-view').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('.dash-tab-btn').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-primary');
+        });
+
+        if (tabName === 'leave') {
+            document.getElementById('dashSubLeave').classList.remove('d-none');
+            document.getElementById('btnDashTabLeave').classList.remove('btn-outline-primary');
+            document.getElementById('btnDashTabLeave').classList.add('btn-primary');
+        } else if (tabName === 'saturday') {
+            document.getElementById('dashSubSaturday').classList.remove('d-none');
+            document.getElementById('btnDashTabSaturday').classList.remove('btn-outline-primary');
+            document.getElementById('btnDashTabSaturday').classList.add('btn-primary');
+        } else if (tabName === 'company') {
+            document.getElementById('dashSubCompany').classList.remove('d-none');
+            document.getElementById('btnDashTabCompany').classList.remove('btn-outline-primary');
+            document.getElementById('btnDashTabCompany').classList.add('btn-primary');
+        }
+        loadLeaves();
+    }
+
+    function switchFormTab(tabName) {
+        if (currentUser && currentUser.role !== 'admin' && (tabName === 'saturday' || tabName === 'company')) {
+            playAudioNotification('error');
+            alert('เฉพาะ Admin เท่านั้นที่สามารถเข้าถึงฟอร์มและบันทึกวันหยุดนี้ได้');
+            return;
+        }
+
+        document.querySelectorAll('.form-section-item').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('#formTypeTabs .nav-link').forEach(btn => btn.classList.remove('active'));
+
+        if (tabName === 'leave') {
+            document.getElementById('formSectionLeave').classList.remove('d-none');
+            document.getElementById('tabBtnLeave').classList.add('active');
+        } else if (tabName === 'saturday') {
+            document.getElementById('formSectionSaturday').classList.remove('d-none');
+            document.getElementById('tabBtnSaturday').classList.add('active');
+            if (currentUser) {
+                document.getElementById('satUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'Admin'})`;
+            }
+        } else if (tabName === 'company') {
+            document.getElementById('formSectionCompany').classList.remove('d-none');
+            document.getElementById('tabBtnCompany').classList.add('active');
+        }
+    }
+
+    function goToAddSatHoliday() {
+        if (currentUser.role !== 'admin') return;
+        switchPage('requestView');
+        switchFormTab('saturday');
+    }
+
+    function goToAddCompHoliday() {
+        if (currentUser.role !== 'admin') return;
+        switchPage('requestView');
+        switchFormTab('company');
+    }
+
+    function showAuthPage(pageCardId) {
+        document.getElementById('loginCard').classList.add('d-none');
+        document.getElementById('registerCard').classList.add('d-none');
+        document.getElementById(pageCardId).classList.remove('d-none');
+    }
+
+    function checkDefaultAdmin() {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        const adminExists = users.some(u => String(u.username || '').trim().toLowerCase() === 'nattapons');
+        
+        if (!adminExists) {
+            users.push({
+                username: 'Nattapons',
+                password: '235050',
+                fullName: 'Nattapons (WH Pantai Admin)',
+                phone: '0800000000',
+                dept: 'WH Pantai',
+                role: 'admin',
+                avatar: defaultAvatar
+            });
+            localStorage.setItem('users', JSON.stringify(users));
+
+            let emps = JSON.parse(localStorage.getItem('employees')) || [];
+            if (!emps.some(e => String(e.name || '').trim() === 'Nattapons (WH Pantai Admin)')) {
+                emps.push({ id: Date.now(), name: 'Nattapons (WH Pantai Admin)', phone: '0800000000', dept: 'WH Pantai', quota: { sick: 30, personal: 6, vacation: 7 } });
+                localStorage.setItem('employees', JSON.stringify(emps));
+            }
+            syncToCloud();
+        }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fullName = document.getElementById('regFullName').value.trim();
+        const phone = formatPhoneNumber(document.getElementById('regPhone').value.trim());
+        const dept = document.getElementById('regDept').value.trim();
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value.trim();
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        if (users.some(u => String(u.username || '').trim().toLowerCase() === username.toLowerCase())) {
+            playAudioNotification('error');
+            alert('Username นี้ถูกใช้งานแล้ว / Username already exists');
+            return;
+        }
+
+        users.push({ username: String(username), password: String(password), fullName, phone, dept, role: 'user', avatar: defaultAvatar });
+        localStorage.setItem('users', JSON.stringify(users));
+
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
+        emps.push({ id: Date.now(), name: fullName, phone: phone, dept: dept, quota: { sick: 30, personal: 6, vacation: 7 } });
+        localStorage.setItem('employees', JSON.stringify(emps));
+
+        syncToCloud();
+        playAudioNotification('success');
+        alert('ลงทะเบียนสำเร็จ! / Registration successful!');
+        this.reset();
+        loadEmployees();
+        showAuthPage('loginCard');
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const u = document.getElementById('loginUsername').value.trim();
+        const p = document.getElementById('loginPassword').value.trim();
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        let foundUser = users.find(user => 
+            String(user.username || '').trim().toLowerCase() === u.toLowerCase() && 
+            String(user.password || '').trim() === p
+        );
+
+        if (!foundUser && GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("วาง_WEB_APP_URL")) {
+            showSyncSpinner(true);
+            try {
+                await fetchCloudData();
+                users = JSON.parse(localStorage.getItem('users')) || [];
+                foundUser = users.find(user => 
+                    String(user.username || '').trim().toLowerCase() === u.toLowerCase() && 
+                    String(user.password || '').trim() === p
+                );
+            } catch (err) {
+                console.error("Login fetch error:", err);
+            } finally {
+                showSyncSpinner(false);
+            }
+        }
+
+        if (foundUser) {
+            currentUser = foundUser;
+            playAudioNotification('success');
+            applyRolePermissions();
+        } else {
+            playAudioNotification('error');
+            alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง! / Invalid credentials');
+        }
+    });
+
+    function applyRolePermissions() {
+        document.getElementById('authContainer').classList.add('d-none');
+        document.getElementById('mainNav').classList.remove('d-none');
+        document.getElementById('mainContent').classList.remove('d-none');
+
+        document.getElementById('userRoleBadge').innerText = String(currentUser.role || 'user').toUpperCase();
+        document.getElementById('currentUserNameDisplay').innerText = `(${currentUser.fullName})`;
+        
+        const avatarSrc = currentUser.avatar || defaultAvatar;
+        document.getElementById('navAvatar').src = avatarSrc;
+        document.getElementById('profAvatarPreview').src = avatarSrc;
+
+        document.getElementById('formUserAvatar').src = avatarSrc;
+        document.getElementById('formUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'WH Pantai'})`;
+        document.getElementById('satUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'Admin'})`;
+
+        document.getElementById('profUsername').value = currentUser.username;
+        document.getElementById('profFullName').value = currentUser.fullName;
+        document.getElementById('profPhone').value = formatPhoneNumber(currentUser.phone);
+        document.getElementById('profDept').value = currentUser.dept;
+
+        const adminElements = document.querySelectorAll('.admin-only');
+        if (currentUser.role === 'admin') {
+            adminElements.forEach(el => el.classList.remove('d-none'));
+        } else {
+            adminElements.forEach(el => el.classList.add('d-none'));
+        }
+
+        loadEmployees();
+        switchPage('upcomingView');
+    }
+
+    function previewProfileImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 150;
+                    const MAX_HEIGHT = 150;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    tempAvatarBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('profAvatarPreview').src = tempAvatarBase64;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const oldFullName = currentUser.fullName;
+        const newFullName = document.getElementById('profFullName').value.trim();
+        const newPhone = formatPhoneNumber(document.getElementById('profPhone').value.trim());
+        const newDept = document.getElementById('profDept').value.trim();
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let userIndex = users.findIndex(u => String(u.username || '').trim().toLowerCase() === String(currentUser.username || '').trim().toLowerCase());
+        if (userIndex !== -1) {
+            users[userIndex].fullName = newFullName;
+            users[userIndex].phone = newPhone;
+            users[userIndex].dept = newDept;
+            if (tempAvatarBase64) users[userIndex].avatar = tempAvatarBase64;
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser = users[userIndex];
+        }
+
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
+        let empIndex = emps.findIndex(e => e.name === oldFullName);
+        if (empIndex !== -1) {
+            emps[empIndex].name = newFullName;
+            emps[empIndex].phone = newPhone;
+            emps[empIndex].dept = newDept;
+            localStorage.setItem('employees', JSON.stringify(emps));
+        }
+
+        let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+        leaves.forEach(leave => {
+            if (leave.empName === oldFullName) leave.empName = newFullName;
+        });
+        localStorage.setItem('leaveData', JSON.stringify(leaves));
+
+        syncToCloud();
+        const avatarSrc = currentUser.avatar || defaultAvatar;
+        document.getElementById('currentUserNameDisplay').innerText = `(${currentUser.fullName})`;
+        document.getElementById('navAvatar').src = avatarSrc;
+        document.getElementById('formUserAvatar').src = avatarSrc;
+        document.getElementById('formUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'WH Pantai'})`;
+        document.getElementById('satUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'Admin'})`;
+
+        playAudioNotification('success');
+        alert('อัปเดตข้อมูลส่วนตัวเรียบร้อยแล้ว!');
+        
+        closeProfileModal();
+        loadEmployees();
+        loadLeaves();
+    });
+
+    function logout() {
+        currentUser = null;
+        tempAvatarBase64 = null;
+        cancelEditMode();
+        cancelSatEditMode();
+        cancelCompEditMode();
+        closeProfileModal();
+        document.getElementById('loginForm').reset();
+        document.getElementById('registerForm').reset();
+        document.getElementById('authContainer').classList.remove('d-none');
+        document.getElementById('mainNav').classList.add('d-none');
+        document.getElementById('mainContent').classList.add('d-none');
+        showAuthPage('loginCard');
+    }
+
+    function switchPage(pageId) {
+        if (currentUser.role !== 'admin' && (pageId === 'dashboardView' || pageId === 'employeeView')) {
+            playAudioNotification('error');
+            alert('คุณไม่มีสิทธิ์เข้าถึงหน้านี้');
+            return;
+        }
+
+        document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+
+        document.getElementById(pageId).classList.add('active');
+        if(pageId === 'upcomingView') {
+            document.getElementById('menuUpcoming').classList.add('active');
+            loadLeaves();
+        }
+        if(pageId === 'requestView') document.getElementById('menuRequest').classList.add('active');
+        if(pageId === 'mySummaryView') {
+            document.getElementById('menuMySummary').classList.add('active');
+            loadLeaves();
+        }
+        if(pageId === 'dashboardView') document.getElementById('menuDashboard').classList.add('active');
+        if(pageId === 'employeeView') document.getElementById('menuEmployee').classList.add('active');
+    }
+
+    document.getElementById('empForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
+        emps.push({ 
+            id: Date.now(), 
+            name: document.getElementById('newEmpName').value.trim(), 
+            phone: formatPhoneNumber(document.getElementById('newEmpPhone').value.trim()), 
+            dept: document.getElementById('newEmpDept').value.trim(),
+            quota: { sick: 30, personal: 6, vacation: 7 }
+        });
+        localStorage.setItem('employees', JSON.stringify(emps));
+        syncToCloud();
+        playAudioNotification('success');
+        this.reset();
+        loadEmployees();
+    });
+
+    async function deleteEmployee(id) {
+        if (confirm('คุณต้องการลบรายชื่อพนักงานนี้ใช่หรือไม่?')) {
+            let emps = JSON.parse(localStorage.getItem('employees')) || [];
+            emps = emps.filter(emp => String(emp.id) !== String(id));
+            localStorage.setItem('employees', JSON.stringify(emps));
+            
+            await syncToCloud();
+            playAudioNotification('success');
+            loadEmployees();
+        }
+    }
+
+    function changeUserRole(username, newRole) {
+        if (!currentUser || currentUser.role !== 'admin') {
+            playAudioNotification('error');
+            alert('เฉพาะ Admin เท่านั้นที่สามารถเปลี่ยนสิทธิ์ได้ / Admin only');
+            return;
+        }
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let uIdx = users.findIndex(u => String(u.username || '').trim().toLowerCase() === String(username || '').trim().toLowerCase());
+
+        if (uIdx !== -1) {
+            users[uIdx].role = newRole;
+            localStorage.setItem('users', JSON.stringify(users));
+
+            if (String(currentUser.username || '').trim().toLowerCase() === String(username || '').trim().toLowerCase()) {
+                currentUser.role = newRole;
+                applyRolePermissions();
+            }
+
+            syncToCloud();
+            playAudioNotification('success');
+            alert(`เปลี่ยนสิทธิ์ของ ${users[uIdx].fullName} เป็น ${newRole.toUpperCase()} เรียบร้อยแล้ว!`);
+            loadEmployees();
+        }
+    }
+
+    function resetUserPassword(username) {
+        if (!currentUser || currentUser.role !== 'admin') {
+            playAudioNotification('error');
+            alert('เฉพาะ Admin เท่านั้นที่สามารถรีเซ็ตรหัสผ่านได้ / Admin only');
+            return;
+        }
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let uIdx = users.findIndex(u => String(u.username || '').trim().toLowerCase() === String(username || '').trim().toLowerCase());
+
+        if (uIdx !== -1) {
+            const newPassword = prompt(`กรอกรหัสผ่านใหม่สำหรับ Username: "${username}"`, "123456");
+            
+            if (newPassword !== null && newPassword.trim() !== "") {
+                users[uIdx].password = String(newPassword.trim());
+                localStorage.setItem('users', JSON.stringify(users));
+                syncToCloud();
+                playAudioNotification('success');
+                alert(`ตั้งรหัสผ่านใหม่ให้บัญชี "${username}" เรียบร้อยแล้ว!`);
+            }
+        } else {
+            playAudioNotification('error');
+            alert('ไม่พบบัญชีผู้ใช้นี้ในระบบ');
+        }
+    }
+
+    async function editEmployeeQuota(empId) {
+        if (!currentUser || currentUser.role !== 'admin') {
+            playAudioNotification('error');
+            alert('เฉพาะ Admin เท่านั้น / Admin only');
+            return;
+        }
+
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
+        let emp = emps.find(e => String(e.id) === String(empId));
+
+        if (emp) {
+            let currentQ = emp.quota;
+            if (typeof currentQ === 'string') {
+                try { currentQ = JSON.parse(currentQ); } catch(err) { currentQ = null; }
+            }
+            if (!currentQ || typeof currentQ !== 'object') {
+                currentQ = { sick: 30, personal: 6, vacation: 7 };
+            }
+
+            const sickStr = prompt(`กำหนดโควต้า "ลาป่วย" (วัน/ปี) สำหรับ ${emp.name}:`, currentQ.sick);
+            if (sickStr === null) return;
+
+            const personalStr = prompt(`กำหนดโควต้า "ลากิจ" (วัน/ปี) สำหรับ ${emp.name}:`, currentQ.personal);
+            if (personalStr === null) return;
+
+            const vacationStr = prompt(`กำหนดโควต้า "ลาพักร้อน" (วัน/ปี) สำหรับ ${emp.name}:`, currentQ.vacation);
+            if (vacationStr === null) return;
+
+            emp.quota = {
+                sick: parseInt(sickStr) || 0,
+                personal: parseInt(personalStr) || 0,
+                vacation: parseInt(vacationStr) || 0
+            };
+
+            localStorage.setItem('employees', JSON.stringify(emps));
+            loadEmployees();
+            loadLeaves();
+
+            await syncToCloud();
+            playAudioNotification('success');
+            alert(`บันทึกโควต้าวันลาของ ${emp.name} เรียบร้อยแล้ว!`);
+        }
+    }
+
+    function approveLeave(leaveId) {
+        if (!currentUser || currentUser.role !== 'admin') {
+            playAudioNotification('error');
+            alert('เฉพาะ Admin เท่านั้นที่สามารถอนุมัติได้');
+            return;
+        }
+
+        let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+        let idx = leaves.findIndex(l => String(l.id) === String(leaveId));
+
+        if (idx !== -1) {
+            leaves[idx].status = 'approved';
+            localStorage.setItem('leaveData', JSON.stringify(leaves));
+            syncToCloud();
+            playAudioNotification('success');
+            alert('อนุมัติการลาเรียบร้อยแล้ว!');
+            loadLeaves();
+        }
+    }
+
+    function loadEmployees() {
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        const lang = translations[currentLang];
+        
+        const tbody = document.getElementById('empTableBody');
+        if(tbody) {
+            tbody.innerHTML = '';
+            emps.forEach(emp => {
+                const userAcc = users.find(u => String(u.fullName || '').trim() === String(emp.name || '').trim());
+                let usernameDisplay = userAcc ? `<span class="badge bg-light text-dark border">${userAcc.username}</span>` : '<span class="text-muted small">ยังไม่มีบัญชี</span>';
+                let roleHtml = '<span class="badge bg-secondary">User</span>';
+                let actionBtnsHtml = '';
+
+                let q = emp.quota;
+                if (typeof q === 'string') {
+                    try { q = JSON.parse(q); } catch(err){ q = null; }
+                }
+                if (!q || typeof q !== 'object') q = { sick: 30, personal: 6, vacation: 7 };
+
+                let quotaDisplay = `<span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-1">ป่วย ${q.sick}</span> ` +
+                                   `<span class="badge bg-warning-subtle text-dark border border-warning-subtle ms-1">กิจ ${q.personal}</span> ` +
+                                   `<span class="badge bg-success-subtle text-success border border-success-subtle ms-1">พักร้อน ${q.vacation}</span>`;
+
+                if (userAcc) {
+                    if (currentUser && currentUser.role === 'admin') {
+                        roleHtml = `
+                            <select class="form-select form-select-sm" onchange="changeUserRole('${userAcc.username}', this.value)">
+                                <option value="user" ${userAcc.role === 'user' ? 'selected' : ''}>User</option>
+                                <option value="admin" ${userAcc.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            </select>`;
+                        
+                        actionBtnsHtml += `<button class="btn btn-warning btn-sm me-1" onclick="resetUserPassword('${userAcc.username}')">${lang.resetPassBtn}</button>`;
+                    } else {
+                        roleHtml = `<span class="badge bg-${userAcc.role === 'admin' ? 'warning text-dark' : 'secondary'}">${String(userAcc.role || 'user').toUpperCase()}</span>`;
+                    }
+                }
+
+                if (currentUser && currentUser.role === 'admin') {
+                    actionBtnsHtml += `<button class="btn btn-info text-white btn-sm me-1" onclick="editEmployeeQuota('${emp.id}')">${lang.setQuotaBtn}</button>`;
+                }
+
+                const phoneDisplay = formatPhoneNumber(emp.phone);
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-bold">${emp.name}</td>
+                        <td>${usernameDisplay}</td>
+                        <td>${phoneDisplay}</td>
+                        <td>${quotaDisplay}</td>
+                        <td style="width: 130px;">${roleHtml}</td>
+                        <td>
+                            ${actionBtnsHtml}
+                            <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')">${lang.deleteBtn}</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        const adminEmpFilter = document.getElementById('adminEmpFilter');
+        if(adminEmpFilter) {
+            const currentFilter = adminEmpFilter.value;
+            adminEmpFilter.innerHTML = `<option value="ALL">พนักงานทุกคน / All</option>`;
+            emps.forEach(emp => {
+                adminEmpFilter.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
+            });
+            if(currentFilter) adminEmpFilter.value = currentFilter;
+        }
+    }
+
+    // ==========================================
+    // บันทึกและจัดการ: ฟอร์มการลา
+    // ==========================================
+    document.getElementById('leaveForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const empName = currentUser.fullName;
+
+        const startRaw = document.getElementById('startDate').value;
+        const endRaw = document.getElementById('endDate').value;
+        let daysInput = parseFloat(document.getElementById('leaveDays').value);
+
+        if(!startRaw || !endRaw) { 
+            playAudioNotification('error');
+            alert("กรุณาระบุวันที่"); 
+            return; 
+        }
+
+        if(isNaN(daysInput) || daysInput <= 0) {
+            daysInput = calculateDays(startRaw, endRaw);
+        }
+
+        let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+        const editingId = document.getElementById('editingLeaveId').value;
+
+        if (editingId) {
+            let idx = leaves.findIndex(l => String(l.id) === String(editingId));
+            if (idx !== -1) {
+                leaves[idx].empName = empName;
+                leaves[idx].leaveType = document.getElementById('leaveType').value;
+                leaves[idx].startDate = parseDateToISO(startRaw);
+                leaves[idx].endDate = parseDateToISO(endRaw);
+                leaves[idx].customDays = daysInput;
+                leaves[idx].reason = document.getElementById('reason').value;
+            }
+            playAudioNotification('success');
+            alert('แก้ไขรายการวันลาเรียบร้อยแล้ว!');
+        } else {
+            leaves.push({
+                id: Date.now(),
+                empName: empName,
+                leaveType: document.getElementById('leaveType').value,
+                startDate: parseDateToISO(startRaw),
+                endDate: parseDateToISO(endRaw),
+                customDays: daysInput,
+                reason: document.getElementById('reason').value,
+                status: 'pending'
+            });
+            playAudioNotification('success');
+            alert('บันทึกการลาเรียบร้อย (รอ Admin อนุมัติ)');
+        }
+
+        localStorage.setItem('leaveData', JSON.stringify(leaves));
+        syncToCloud();
+        cancelEditMode();
+        loadLeaves();
+        switchPage('mySummaryView');
+    });
+
+    function startEditLeave(id) {
+        let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+        let leave = leaves.find(l => String(l.id) === String(id));
+
+        if (leave) {
+            document.getElementById('editingLeaveId').value = leave.id;
+            document.getElementById('leaveType').value = leave.leaveType;
+            
+            startPicker.setDate(formatDateDisplay(leave.startDate));
+            endPicker.setDate(formatDateDisplay(leave.endDate));
+            
+            document.getElementById('leaveDays').value = getLeaveDaysVal(leave);
+            document.getElementById('reason').value = leave.reason;
+
+            document.getElementById('editModeBadge').classList.remove('d-none');
+            document.getElementById('btnCancelEdit').classList.remove('d-none');
+            document.getElementById('btnSubmit').innerText = 'บันทึกการแก้ไขวันลา';
+
+            switchPage('requestView');
+            switchFormTab('leave');
+        }
+    }
+
+    function cancelEditMode() {
+        document.getElementById('leaveForm').reset();
+        document.getElementById('editingLeaveId').value = '';
+        document.getElementById('leaveDays').value = '';
+        startPicker.clear();
+        endPicker.clear();
+
+        document.getElementById('editModeBadge').classList.add('d-none');
+        document.getElementById('btnCancelEdit').classList.add('d-none');
+        document.getElementById('btnSubmit').innerText = 'บันทึกการลา';
+
+        if (currentUser) {
+            document.getElementById('formUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'WH Pantai'})`;
+        }
+    }
+
+    async function deleteLeave(id) {
+        if (confirm('คุณต้องการยกเลิก/ลบรายการลานี้ใช่หรือไม่?')) {
+            let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+            leaves = leaves.filter(leave => String(leave.id) !== String(id));
+            localStorage.setItem('leaveData', JSON.stringify(leaves));
+            
+            await syncToCloud();
+            playAudioNotification('success');
+            loadLeaves();
+        }
+    }
+
+    // ==========================================
+    // บันทึกและจัดการ: วันหยุดประจำวันเสาร์ (อัปเดตระบบ)
+    // ==========================================
+    document.getElementById('saturdayForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const startRaw = document.getElementById('satStartDate').value;
+        const endRaw = document.getElementById('satEndDate').value;
+        let daysInput = parseFloat(document.getElementById('satDays').value);
+        const title = document.getElementById('satTitle').value.trim();
+
+        if (!startRaw || !endRaw) {
+            playAudioNotification('error');
+            alert('กรุณาระบุวันที่เริ่มและหยุดถึงวันที่');
+            return;
+        }
+
+        if (isNaN(daysInput) || daysInput <= 0) {
+            daysInput = calculateDays(startRaw, endRaw);
+        }
+
+        let satHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
+        const editingId = document.getElementById('editingSatId').value;
+        const adminName = currentUser ? currentUser.fullName : 'Admin';
+
+        if (editingId) {
+            let idx = satHolidays.findIndex(s => String(s.id) === String(editingId));
+            if (idx !== -1) {
+                satHolidays[idx].startDate = parseDateToISO(startRaw);
+                satHolidays[idx].endDate = parseDateToISO(endRaw);
+                satHolidays[idx].days = daysInput;
+                satHolidays[idx].title = title;
+                satHolidays[idx].createdByName = adminName;
+            }
+            playAudioNotification('success');
+            alert('แก้ไขรายการวันหยุดเสาร์เรียบร้อยแล้ว!');
+        } else {
+            satHolidays.push({
+                id: Date.now(),
+                startDate: parseDateToISO(startRaw),
+                endDate: parseDateToISO(endRaw),
+                days: daysInput,
+                title: title,
+                createdByName: adminName
+            });
+            playAudioNotification('success');
+            alert('บันทึกวันหยุดเสาร์เรียบร้อยแล้ว!');
+        }
+
+        localStorage.setItem('saturdayHolidays', JSON.stringify(satHolidays));
+        syncToCloud();
+        cancelSatEditMode();
+        loadLeaves();
+        switchPage('upcomingView');
+        switchDashSubTab('saturday');
+    });
+
+    function startEditSaturday(id) {
+        let satHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
+        let item = satHolidays.find(s => String(s.id) === String(id));
+
+        if (item) {
+            document.getElementById('editingSatId').value = item.id;
+            satStartPicker.setDate(formatDateDisplay(item.startDate || item.date));
+            satEndPicker.setDate(formatDateDisplay(item.endDate || item.date));
+            document.getElementById('satDays').value = item.days || calculateDays(item.startDate || item.date, item.endDate || item.date);
+            document.getElementById('satTitle').value = item.title || '';
+
+            document.getElementById('editSatBadge').classList.remove('d-none');
+            document.getElementById('btnCancelSatEdit').classList.remove('d-none');
+            document.getElementById('btnSubmitSat').innerText = 'บันทึกการแก้ไขวันหยุดเสาร์';
+
+            switchPage('requestView');
+            switchFormTab('saturday');
+        }
+    }
+
+    function cancelSatEditMode() {
+        document.getElementById('saturdayForm').reset();
+        document.getElementById('editingSatId').value = '';
+        document.getElementById('satDays').value = '';
+        satStartPicker.clear();
+        satEndPicker.clear();
+
+        document.getElementById('editSatBadge').classList.add('d-none');
+        document.getElementById('btnCancelSatEdit').classList.add('d-none');
+        document.getElementById('btnSubmitSat').innerText = 'บันทึกวันหยุดเสาร์';
+
+        if (currentUser) {
+            document.getElementById('satUserDisplayName').value = `${currentUser.fullName} (${currentUser.dept || 'Admin'})`;
+        }
+    }
+
+    async function deleteSaturday(id) {
+        if (confirm('คุณต้องการลบรายการวันหยุดเสาร์นี้ใช่หรือไม่?')) {
+            let satHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
+            satHolidays = satHolidays.filter(s => String(s.id) !== String(id));
+            localStorage.setItem('saturdayHolidays', JSON.stringify(satHolidays));
+
+            await syncToCloud();
+            playAudioNotification('success');
+            loadLeaves();
+        }
+    }
+
+    // ==========================================
+    // บันทึกและจัดการ: วันหยุดบริษัทประจำปี (อัปเดตระบบ)
+    // ==========================================
+    document.getElementById('companyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const startRaw = document.getElementById('compStartDate').value;
+        const endRaw = document.getElementById('compEndDate').value;
+        let daysInput = parseFloat(document.getElementById('compDays').value);
+        const title = document.getElementById('compTitle').value.trim();
+
+        if (!startRaw || !endRaw) {
+            playAudioNotification('error');
+            alert('กรุณาระบุวันที่');
+            return;
+        }
+
+        if (isNaN(daysInput) || daysInput <= 0) {
+            daysInput = calculateDays(startRaw, endRaw);
+        }
+
+        let compHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
+        const editingId = document.getElementById('editingCompId').value;
+        const adminName = currentUser ? currentUser.fullName : 'Admin';
+
+        if (editingId) {
+            let idx = compHolidays.findIndex(c => String(c.id) === String(editingId));
+            if (idx !== -1) {
+                compHolidays[idx].title = title;
+                compHolidays[idx].startDate = parseDateToISO(startRaw);
+                compHolidays[idx].endDate = parseDateToISO(endRaw);
+                compHolidays[idx].days = daysInput;
+                compHolidays[idx].createdByName = adminName;
+            }
+            playAudioNotification('success');
+            alert('แก้ไขวันหยุดบริษัทเรียบร้อยแล้ว!');
+        } else {
+            compHolidays.push({
+                id: Date.now(),
+                title: title,
+                startDate: parseDateToISO(startRaw),
+                endDate: parseDateToISO(endRaw),
+                days: daysInput,
+                createdByName: adminName
+            });
+            playAudioNotification('success');
+            alert('บันทึกวันหยุดบริษัทเรียบร้อยแล้ว!');
+        }
+
+        localStorage.setItem('companyHolidays', JSON.stringify(compHolidays));
+        syncToCloud();
+        cancelCompEditMode();
+        loadLeaves();
+        switchPage('upcomingView');
+        switchDashSubTab('company');
+    });
+
+    function startEditCompany(id) {
+        let compHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
+        let item = compHolidays.find(c => String(c.id) === String(id));
+
+        if (item) {
+            document.getElementById('editingCompId').value = item.id;
+            compStartPicker.setDate(formatDateDisplay(item.startDate));
+            compEndPicker.setDate(formatDateDisplay(item.endDate));
+            document.getElementById('compDays').value = item.days || calculateDays(item.startDate, item.endDate);
+            document.getElementById('compTitle').value = item.title || '';
+
+            document.getElementById('editCompBadge').classList.remove('d-none');
+            document.getElementById('btnCancelCompEdit').classList.remove('d-none');
+            document.getElementById('btnSubmitComp').innerText = 'บันทึกการแก้ไขวันหยุดบริษัท';
+
+            switchPage('requestView');
+            switchFormTab('company');
+        }
+    }
+
+    function cancelCompEditMode() {
+        document.getElementById('companyForm').reset();
+        document.getElementById('editingCompId').value = '';
+        document.getElementById('compDays').value = '';
+        compStartPicker.clear();
+        compEndPicker.clear();
+
+        document.getElementById('editCompBadge').classList.add('d-none');
+        document.getElementById('btnCancelCompEdit').classList.add('d-none');
+        document.getElementById('btnSubmitComp').innerText = 'บันทึกวันหยุดบริษัท';
+    }
+
+    async function deleteCompany(id) {
+        if (confirm('คุณต้องการลบรายการวันหยุดบริษัทนี้ใช่หรือไม่?')) {
+            let compHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
+            compHolidays = compHolidays.filter(c => String(c.id) !== String(id));
+            localStorage.setItem('companyHolidays', JSON.stringify(compHolidays));
+
+            await syncToCloud();
+            playAudioNotification('success');
+            loadLeaves();
+        }
+    }
+
+    // ==========================================
+    // การโหลดข้อมูลแสดงผลในตาราง Dashboard ต่างๆ
+    // ==========================================
+    function loadLeaves() {
+        let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+        let satHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
+        let compHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
+        const lang = translations[currentLang];
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dateDisplayEl = document.getElementById('txtCurrentDateInfo');
+        if (dateDisplayEl) dateDisplayEl.innerText = `วันนี้: ${formatDateDisplay(todayStr)}`;
+
+        // 1. Dashboard ลางาน
+        const upcomingTbody = document.getElementById('upcomingTableBody');
+        if(upcomingTbody) {
+            upcomingTbody.innerHTML = '';
+            const activeLeaves = leaves.filter(leave => parseDateToISO(leave.endDate) >= todayStr);
+
+            if(activeLeaves.length === 0) {
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 9 : 7;
+                upcomingTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">${lang.noLeavesMsg}</td></tr>`;
+            } else {
+                activeLeaves.forEach(leave => {
+                    const days = getLeaveDaysVal(leave);
+                    let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                    let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                    
+                    let statusBadge = (leave.status === 'approved') 
+                        ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                        : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
+
+                    const empUser = users.find(u => String(u.fullName || '').trim() === String(leave.empName || '').trim());
+                    const empAvatar = (empUser && empUser.avatar) ? empUser.avatar : defaultAvatar;
+
+                    const reasonCell = (currentUser && currentUser.role === 'admin') ? `<td class="admin-only">${leave.reason}</td>` : '';
+                    
+                    let adminActionCell = '';
+                    if (currentUser && currentUser.role === 'admin') {
+                        let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
+                        adminActionCell = `<td class="admin-only">${approveBtnHtml}<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button><button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button></td>`;
+                    }
+
+                    upcomingTbody.innerHTML += `
+                        <tr>
+                            <td><img src="${empAvatar}" alt="${leave.empName}" class="table-avatar shadow-sm"></td>
+                            <td class="fw-bold">${leave.empName}</td>
+                            <td>${typeBadge}</td>
+                            <td>${formatDateDisplay(leave.startDate)}</td>
+                            <td>${formatDateDisplay(leave.endDate)}</td>
+                            <td class="fw-bold text-primary text-center">${days} ${lang.txtDayUnit}</td>
+                            ${reasonCell}
+                            <td>${statusBadge}</td>
+                            ${adminActionCell}
+                        </tr>`;
+                });
+            }
+        }
+
+        // 2. Dashboard วันหยุดประจำวันเสาร์
+        // โชว์ข้อมูล: 1. วันที่เริ่มอย่างเดียว 2. ชื่อ 3. รายละเอียดวันหยุด 4. จำนวนวัน
+        const saturdayTbody = document.getElementById('saturdayTableBody');
+        if (saturdayTbody) {
+            saturdayTbody.innerHTML = '';
+            satHolidays.sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
+
+            if (satHolidays.length === 0) {
+                saturdayTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted p-4">ไม่มีรายการวันหยุดประจำวันเสาร์</td></tr>`;
+            } else {
+                satHolidays.forEach((item, index) => {
+                    const startDateDisplay = formatDateDisplay(item.startDate || item.date);
+                    const days = item.days || calculateDays(item.startDate || item.date, item.endDate || item.date) || 1;
+                    const nameDisplay = item.createdByName || '-';
+
+                    let actionBtns = '';
+                    if (currentUser && currentUser.role === 'admin') {
+                        actionBtns = `<button class="btn btn-warning btn-sm me-1" onclick="startEditSaturday('${item.id}')">✏️ ${lang.editBtn}</button>` +
+                                     `<button class="btn btn-outline-danger btn-sm" onclick="deleteSaturday('${item.id}')">${lang.deleteBtn}</button>`;
+                    } else {
+                        actionBtns = `<span class="text-muted small">-</span>`;
+                    }
+
+                    saturdayTbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td class="fw-bold text-primary">${startDateDisplay}</td>
+                            <td>${nameDisplay}</td>
+                            <td>${item.title || '-'}</td>
+                            <td class="fw-bold text-center">${days} ${lang.txtDayUnit}</td>
+                            <td>${actionBtns}</td>
+                        </tr>`;
+                });
+            }
+        }
+
+        // 3. Dashboard วันหยุดบริษัทประจำปี
+        // โชว์ข้อมูล: 1. วันที่เริ่ม กับถึงวันที่ 2. จำนวนวัน 3. รายละเอียดวันหยุด
+        const companyTbody = document.getElementById('companyTableBody');
+        if (companyTbody) {
+            companyTbody.innerHTML = '';
+            compHolidays.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+            if (compHolidays.length === 0) {
+                companyTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted p-4">ไม่มีรายการวันหยุดบริษัทประจำปี</td></tr>`;
+            } else {
+                compHolidays.forEach((item, index) => {
+                    let days = item.days || calculateDays(item.startDate, item.endDate);
+
+                    let actionBtns = '';
+                    if (currentUser && currentUser.role === 'admin') {
+                        actionBtns = `<button class="btn btn-warning btn-sm me-1" onclick="startEditCompany('${item.id}')">✏️ ${lang.editBtn}</button>` +
+                                     `<button class="btn btn-outline-danger btn-sm" onclick="deleteCompany('${item.id}')">${lang.deleteBtn}</button>`;
+                    } else {
+                        actionBtns = `<span class="text-muted small">-</span>`;
+                    }
+
+                    companyTbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td class="fw-bold">${formatDateDisplay(item.startDate)}</td>
+                            <td class="fw-bold">${formatDateDisplay(item.endDate)}</td>
+                            <td class="fw-bold text-center text-primary">${days} ${lang.txtDayUnit}</td>
+                            <td>${item.title}</td>
+                            <td>${actionBtns}</td>
+                        </tr>`;
+                });
+            }
+        }
+
+        // 4. สรุปข้อมูลสำหรับ User
+        if (currentUser) {
+            const selectedUserYear = document.getElementById('userYearSelect').value;
+            document.getElementById('mySummaryUserDisplay').innerText = currentUser.fullName;
+            document.getElementById('mySummaryUserAvatar').src = currentUser.avatar || defaultAvatar;
+            
+            const myEmp = emps.find(e => String(e.name || '').trim() === String(currentUser.fullName || '').trim());
+            
+            let userQuota = (myEmp && myEmp.quota) ? myEmp.quota : { sick: 30, personal: 6, vacation: 7 };
+            if (typeof userQuota === 'string') {
+                try { userQuota = JSON.parse(userQuota); } catch(err){ userQuota = { sick: 30, personal: 6, vacation: 7 }; }
+            }
+
+            const myLeaves = leaves.filter(l => {
+                const isoStart = parseDateToISO(l.startDate);
+                const leaveYear = isoStart ? isoStart.split('-')[0] : '';
+                return (String(l.empName || '').trim() === String(currentUser.fullName || '').trim()) && (leaveYear === selectedUserYear);
+            });
+
+            const myHistoryTbody = document.getElementById('myHistoryTableBody');
+            let mySickDays = 0, myPersonalDays = 0, myVacationDays = 0;
+
+            if (myHistoryTbody) {
+                myHistoryTbody.innerHTML = '';
+                if (myLeaves.length === 0) {
+                    myHistoryTbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted p-4">${lang.noHistoryMsg}</td></tr>`;
+                } else {
+                    myLeaves.forEach(leave => {
+                        const days = getLeaveDaysVal(leave);
+
+                        if (leave.leaveType === 'sick') mySickDays += days;
+                        if (leave.leaveType === 'personal') myPersonalDays += days;
+                        if (leave.leaveType === 'vacation') myVacationDays += days;
+
+                        let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                        let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                        let statusBadge = (leave.status === 'approved') 
+                            ? `<span class="badge bg-success px-2 py-1">${lang.approvedStatus}</span>` 
+                            : `<span class="badge bg-warning text-dark px-2 py-1">${lang.pendingStatus}</span>`;
+
+                        myHistoryTbody.innerHTML += `
+                            <tr>
+                                <td>${typeBadge}</td>
+                                <td>${formatDateDisplay(leave.startDate)}</td>
+                                <td>${formatDateDisplay(leave.endDate)}</td>
+                                <td class="fw-bold text-primary text-center">${days} ${lang.txtDayUnit}</td>
+                                <td>${leave.reason}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>
+                                </td>
+                            </tr>`;
+                    });
+                }
+            }
+
+            document.getElementById('countMySick').innerText = `${mySickDays}/${userQuota.sick}`;
+            document.getElementById('countMyPersonal').innerText = `${myPersonalDays}/${userQuota.personal}`;
+            document.getElementById('countMyVacation').innerText = `${myVacationDays}/${userQuota.vacation}`;
+        }
+
+        // 5. แดชบอร์ด Admin ภาพรวม
+        if (currentUser && currentUser.role === 'admin') {
+            const adminTbody = document.getElementById('leaveTableBody');
+            const selectedEmpFilter = document.getElementById('adminEmpFilter').value;
+            const selectedYearFilter = document.getElementById('adminYearSelect').value;
+
+            let filteredLeaves = leaves.filter(l => {
+                const isoStart = parseDateToISO(l.startDate);
+                const leaveYear = isoStart ? isoStart.split('-')[0] : '';
+                const matchYear = (selectedYearFilter === 'ALL' || leaveYear === selectedYearFilter);
+                const matchEmp = (selectedEmpFilter === 'ALL' || String(l.empName || '').trim() === selectedEmpFilter);
+                return matchYear && matchEmp;
+            });
+
+            let totalLeavesCount = filteredLeaves.length;
+            let totalSick = 0, totalPersonal = 0, totalVacation = 0;
+
+            if (adminTbody) {
+                adminTbody.innerHTML = '';
+                if (filteredLeaves.length === 0) {
+                    adminTbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4">ไม่พบประวัติการลาตามเงื่อนไขที่เลือก</td></tr>`;
+                } else {
+                    filteredLeaves.forEach(leave => {
+                        const days = getLeaveDaysVal(leave);
+
+                        if (leave.leaveType === 'sick') totalSick += days;
+                        if (leave.leaveType === 'personal') totalPersonal += days;
+                        if (leave.leaveType === 'vacation') totalVacation += days;
+
+                        let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                        let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                        let statusBadge = (leave.status === 'approved') 
+                            ? `<span class="badge bg-success px-2 py-1">${lang.approvedStatus}</span>` 
+                            : `<span class="badge bg-warning text-dark px-2 py-1">${lang.pendingStatus}</span>`;
+
+                        let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
+
+                        adminTbody.innerHTML += `
+                            <tr>
+                                <td class="fw-bold">${leave.empName}</td>
+                                <td>${typeBadge}</td>
+                                <td>${formatDateDisplay(leave.startDate)}</td>
+                                <td>${formatDateDisplay(leave.endDate)}</td>
+                                <td class="fw-bold text-primary text-center">${days} ${lang.txtDayUnit}</td>
+                                <td>${leave.reason}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    ${approveBtnHtml}
+                                    <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>
+                                </td>
+                            </tr>`;
+                    });
+                }
+            }
+
+            document.getElementById('countTotal').innerText = totalLeavesCount;
+            document.getElementById('countSick').innerText = totalSick;
+            document.getElementById('countPersonal').innerText = totalPersonal;
+            document.getElementById('countVacation').innerText = totalVacation;
+        }
+    }
+
+    // เริ่มต้นทำงาน
+    document.addEventListener('DOMContentLoaded', function() {
+        checkDefaultAdmin();
+        fetchCloudData();
+    });
+</script>
+</body>
+</html>
