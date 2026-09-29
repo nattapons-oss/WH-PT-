@@ -257,7 +257,7 @@
                                     <th id="thSatUser">ชื่อ</th>
                                     <th id="thSatTitle">รายละเอียดวันหยุด</th>
                                     <th id="thSatDays" class="text-center">จำนวนวัน</th>
-                                    <th id="thSatAction">จัดการ</th>
+                                    <th id="thSatAction" class="admin-only">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="saturdayTableBody"></tbody>
@@ -282,7 +282,7 @@
                                     <th id="thCompEnd">ถึงวันที่</th>
                                     <th id="thCompDays" class="text-center">จำนวนวัน</th>
                                     <th id="thCompTitle">รายละเอียดวันหยุด</th>
-                                    <th id="thCompAction">จัดการ</th>
+                                    <th id="thCompAction" class="admin-only">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="companyTableBody"></tbody>
@@ -1942,7 +1942,8 @@
             satHolidays.sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
 
             if (satHolidays.length === 0) {
-                saturdayTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted p-4">ไม่มีรายการวันหยุดประจำวันเสาร์</td></tr>`;
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 6 : 5;
+                saturdayTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">ไม่มีรายการวันหยุดประจำวันเสาร์</td></tr>`;
             } else {
                 satHolidays.forEach((item, index) => {
                     const startDateDisplay = formatDateDisplay(item.startDate || item.date);
@@ -1951,10 +1952,8 @@
 
                     let actionBtns = '';
                     if (currentUser && currentUser.role === 'admin') {
-                        actionBtns = `<button class="btn btn-warning btn-sm me-1" onclick="startEditSaturday('${item.id}')">✏️ ${lang.editBtn}</button>` +
-                                     `<button class="btn btn-outline-danger btn-sm" onclick="deleteSaturday('${item.id}')">${lang.deleteBtn}</button>`;
-                    } else {
-                        actionBtns = `<span class="text-muted small">-</span>`;
+                        actionBtns = `<td class="admin-only"><button class="btn btn-warning btn-sm me-1" onclick="startEditSaturday('${item.id}')">✏️ ${lang.editBtn}</button>` +
+                                     `<button class="btn btn-outline-danger btn-sm" onclick="deleteSaturday('${item.id}')">${lang.deleteBtn}</button></td>`;
                     }
 
                     saturdayTbody.innerHTML += `
@@ -1964,7 +1963,7 @@
                             <td>${nameDisplay}</td>
                             <td>${item.title || '-'}</td>
                             <td class="fw-bold text-center">${days} ${lang.txtDayUnit}</td>
-                            <td>${actionBtns}</td>
+                            ${actionBtns}
                         </tr>`;
                 });
             }
@@ -1977,17 +1976,16 @@
             compHolidays.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
             if (compHolidays.length === 0) {
-                companyTbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted p-4">ไม่มีรายการวันหยุดบริษัทประจำปี</td></tr>`;
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 6 : 5;
+                companyTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">ไม่มีรายการวันหยุดบริษัทประจำปี</td></tr>`;
             } else {
                 compHolidays.forEach((item, index) => {
                     let days = item.days || calculateDays(item.startDate, item.endDate);
 
                     let actionBtns = '';
                     if (currentUser && currentUser.role === 'admin') {
-                        actionBtns = `<button class="btn btn-warning btn-sm me-1" onclick="startEditCompany('${item.id}')">✏️ ${lang.editBtn}</button>` +
-                                     `<button class="btn btn-outline-danger btn-sm" onclick="deleteCompany('${item.id}')">${lang.deleteBtn}</button>`;
-                    } else {
-                        actionBtns = `<span class="text-muted small">-</span>`;
+                        actionBtns = `<td class="admin-only"><button class="btn btn-warning btn-sm me-1" onclick="startEditCompany('${item.id}')">✏️ ${lang.editBtn}</button>` +
+                                     `<button class="btn btn-outline-danger btn-sm" onclick="deleteCompany('${item.id}')">${lang.deleteBtn}</button></td>`;
                     }
 
                     companyTbody.innerHTML += `
@@ -1997,7 +1995,7 @@
                             <td class="fw-bold">${formatDateDisplay(item.endDate)}</td>
                             <td class="fw-bold text-center text-primary">${days} ${lang.txtDayUnit}</td>
                             <td>${item.title}</td>
-                            <td>${actionBtns}</td>
+                            ${actionBtns}
                         </tr>`;
                 });
             }
@@ -2054,7 +2052,7 @@
                                 <td>${typeBadge}</td>
                                 <td>${formatDateDisplay(leave.startDate)}</td>
                                 <td>${formatDateDisplay(leave.endDate)}</td>
-                                <td class="fw-bold text-center text-primary">${days} ${lang.txtDayUnit}</td>
+                                <td class="fw-bold text-center">${days}</td>
                                 <td>${leave.reason}</td>
                                 <td>${statusBadge}</td>
                                 <td>
@@ -2066,127 +2064,82 @@
                 }
             }
 
-            // แสดงโควต้าคงเหลือ/ที่ใช้ไปในรูปแบบ x/y
-            const countMySickEl = document.getElementById('countMySick');
-            if (countMySickEl) countMySickEl.innerText = `${mySickDays}/${userQuota.sick || 30}`;
-
-            const countMyPersonalEl = document.getElementById('countMyPersonal');
-            if (countMyPersonalEl) countMyPersonalEl.innerText = `${myPersonalDays}/${userQuota.personal || 6}`;
-
-            const countMyVacationEl = document.getElementById('countMyVacation');
-            if (countMyVacationEl) countMyVacationEl.innerText = `${myVacationDays}/${userQuota.vacation || 7}`;
+            if(document.getElementById('countMySick')) document.getElementById('countMySick').innerText = `${mySickDays}/${userQuota.sick}`;
+            if(document.getElementById('countMyPersonal')) document.getElementById('countMyPersonal').innerText = `${myPersonalDays}/${userQuota.personal}`;
+            if(document.getElementById('countMyVacation')) document.getElementById('countMyVacation').innerText = `${myVacationDays}/${userQuota.vacation}`;
         }
 
-        // 5. แดชบอร์ดภาพรวม Admin (หน้า แดชบอร์ด & ประวัติ)
-        const adminEmpFilterEl = document.getElementById('adminEmpFilter');
-        const adminYearSelectEl = document.getElementById('adminYearSelect');
-        const selectedEmp = adminEmpFilterEl ? adminEmpFilterEl.value : 'ALL';
-        const selectedYear = adminYearSelectEl ? adminYearSelectEl.value : '2026';
+        // 5. สรุปภาพรวมสำหรับ Admin (หน้า Dashboard ภาพรวม Admin)
+        if (currentUser && currentUser.role === 'admin') {
+            const adminEmpFilterEl = document.getElementById('adminEmpFilter');
+            const selectedEmp = adminEmpFilterEl ? adminEmpFilterEl.value : 'ALL';
 
-        // กรองการลาตามพนักงานและปีที่เลือก
-        const adminFilteredLeaves = leaves.filter(l => {
-            const matchEmp = (selectedEmp === 'ALL' || String(l.empName || '').trim() === String(selectedEmp || '').trim());
-            const isoStart = parseDateToISO(l.startDate);
-            const leaveYear = isoStart ? isoStart.split('-')[0] : '';
-            const matchYear = (selectedYear === 'ALL' || leaveYear === selectedYear);
-            return matchEmp && matchYear;
-        });
+            const adminYearSelectEl = document.getElementById('adminYearSelect');
+            const selectedYear = adminYearSelectEl ? adminYearSelectEl.value : '2026';
 
-        let totalSickDays = 0;
-        let totalPersonalDays = 0;
-        let totalVacationDays = 0;
+            let filteredLeaves = leaves.filter(l => {
+                const isoStart = parseDateToISO(l.startDate);
+                const leaveYear = isoStart ? isoStart.split('-')[0] : '';
+                
+                const matchEmp = (selectedEmp === 'ALL' || String(l.empName || '').trim() === selectedEmp);
+                const matchYear = (selectedYear === 'ALL' || leaveYear === selectedYear);
 
-        adminFilteredLeaves.forEach(l => {
-            const days = getLeaveDaysVal(l);
-            if (l.leaveType === 'sick') totalSickDays += days;
-            if (l.leaveType === 'personal') totalPersonalDays += days;
-            if (l.leaveType === 'vacation') totalVacationDays += days;
-        });
+                return matchEmp && matchYear;
+            });
 
-        // คำนวณโควต้ารวม (หากเลือกรายคนจะใช้โควต้าคนนั้น หากเลือกทั้งหมดจะรวมโควต้าของทุกคน)
-        let quotaSick = 0;
-        let quotaPersonal = 0;
-        let quotaVacation = 0;
+            let totalLeavesCount = filteredLeaves.length;
+            let sickCount = 0, personalCount = 0, vacationCount = 0;
 
-        if (selectedEmp === 'ALL') {
-            if (emps.length > 0) {
-                emps.forEach(emp => {
-                    let q = emp.quota;
-                    if (typeof q === 'string') {
-                        try { q = JSON.parse(q); } catch(err){ q = null; }
-                    }
-                    if (!q || typeof q !== 'object') q = { sick: 30, personal: 6, vacation: 7 };
-                    quotaSick += (parseInt(q.sick) || 0);
-                    quotaPersonal += (parseInt(q.personal) || 0);
-                    quotaVacation += (parseInt(q.vacation) || 0);
-                });
-            } else {
-                quotaSick = 30; quotaPersonal = 6; quotaVacation = 7;
+            const leaveTbody = document.getElementById('leaveTableBody');
+            if (leaveTbody) {
+                leaveTbody.innerHTML = '';
+                if (filteredLeaves.length === 0) {
+                    leaveTbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4">ไม่พบประวัติการลาตามเงื่อนไขที่เลือก</td></tr>`;
+                } else {
+                    filteredLeaves.forEach(leave => {
+                        const days = getLeaveDaysVal(leave);
+
+                        if (leave.leaveType === 'sick') sickCount += days;
+                        if (leave.leaveType === 'personal') personalCount += days;
+                        if (leave.leaveType === 'vacation') vacationCount += days;
+
+                        let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                        let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+
+                        let statusBadge = (leave.status === 'approved') 
+                            ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                            : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
+
+                        let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
+
+                        leaveTbody.innerHTML += `
+                            <tr>
+                                <td class="fw-bold">${leave.empName}</td>
+                                <td>${typeBadge}</td>
+                                <td>${formatDateDisplay(leave.startDate)}</td>
+                                <td>${formatDateDisplay(leave.endDate)}</td>
+                                <td class="fw-bold text-center">${days}</td>
+                                <td>${leave.reason}</td>
+                                <td>${statusBadge}</td>
+                                <td>
+                                    ${approveBtnHtml}
+                                    <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>
+                                </td>
+                            </tr>`;
+                    });
+                }
             }
-        } else {
-            const targetEmp = emps.find(e => String(e.name || '').trim() === String(selectedEmp || '').trim());
-            let q = (targetEmp && targetEmp.quota) ? targetEmp.quota : { sick: 30, personal: 6, vacation: 7 };
-            if (typeof q === 'string') {
-                try { q = JSON.parse(q); } catch(err){ q = { sick: 30, personal: 6, vacation: 7 }; }
-            }
-            quotaSick = parseInt(q.sick) || 0;
-            quotaPersonal = parseInt(q.personal) || 0;
-            quotaVacation = parseInt(q.vacation) || 0;
-        }
 
-        // แสดงผลในหน้า แดชบอร์ดภาพรวม Admin (แดชบอร์ด & ประวัติ)
-        const countTotalEl = document.getElementById('countTotal');
-        if (countTotalEl) countTotalEl.innerText = adminFilteredLeaves.length;
-
-        const countSickEl = document.getElementById('countSick');
-        if (countSickEl) countSickEl.innerText = `${totalSickDays}/${quotaSick}`;
-
-        const countPersonalEl = document.getElementById('countPersonal');
-        if (countPersonalEl) countPersonalEl.innerText = `${totalPersonalDays}/${quotaPersonal}`;
-
-        const countVacationEl = document.getElementById('countVacation');
-        if (countVacationEl) countVacationEl.innerText = `${totalVacationDays}/${quotaVacation}`;
-
-        const leaveTbody = document.getElementById('leaveTableBody');
-        if (leaveTbody) {
-            leaveTbody.innerHTML = '';
-            if (adminFilteredLeaves.length === 0) {
-                leaveTbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4">${lang.noHistoryMsg}</td></tr>`;
-            } else {
-                adminFilteredLeaves.forEach(leave => {
-                    const days = getLeaveDaysVal(leave);
-                    let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
-                    let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
-
-                    let statusBadge = (leave.status === 'approved') 
-                        ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
-                        : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
-
-                    let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
-
-                    leaveTbody.innerHTML += `
-                        <tr>
-                            <td class="fw-bold">${leave.empName}</td>
-                            <td>${typeBadge}</td>
-                            <td>${formatDateDisplay(leave.startDate)}</td>
-                            <td>${formatDateDisplay(leave.endDate)}</td>
-                            <td class="fw-bold text-center text-primary">${days} ${lang.txtDayUnit}</td>
-                            <td>${leave.reason}</td>
-                            <td>${statusBadge}</td>
-                            <td>
-                                ${approveBtnHtml}
-                                <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>
-                            </td>
-                        </tr>`;
-                });
-            }
+            if(document.getElementById('countTotal')) document.getElementById('countTotal').innerText = totalLeavesCount;
+            if(document.getElementById('countSick')) document.getElementById('countSick').innerText = `${sickCount}/30`;
+            if(document.getElementById('countPersonal')) document.getElementById('countPersonal').innerText = `${personalCount}/6`;
+            if(document.getElementById('countVacation')) document.getElementById('countVacation').innerText = `${vacationCount}/7`;
         }
     }
 
-    // เรียกทำงานเมื่อโหลดหน้าครั้งแรก
+    // เริ่มต้นระบบ
     checkDefaultAdmin();
-    fetchCloudData();
     loadEmployees();
     loadLeaves();
 </script>
