@@ -42,6 +42,14 @@
             vertical-align: middle !important; 
         }
 
+        /* เพิ่มขีดเส้นขั้นระหว่างรายการเพื่อความสบายตา */
+        .table-bordered-rows tbody tr {
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+        .table-bordered-rows tbody tr:last-child {
+            border-bottom: none !important;
+        }
+
         .btn-lang { background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(5px); }
         .btn-lang:hover { background: rgba(255, 255, 255, 0.3); color: white; }
         
@@ -227,7 +235,7 @@
                 <div id="dashSubLeave" class="dash-sub-view">
                     <p class="text-muted small mb-3" id="upcomingDesc">* แสดงเฉพาะรายการที่ยังไม่ถึงกำหนดหรือกำลังอยู่ในช่วงลาเท่านั้น</p>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle table-custom-header">
+                        <table class="table table-hover align-middle table-custom-header table-bordered-rows">
                             <thead>
                                 <tr>
                                     <th style="width: 60px;" id="thUpImg">รูป</th>
@@ -255,7 +263,7 @@
                             </button>
                         </div>
                         <div class="table-responsive shadow-sm rounded-3">
-                            <table class="table table-hover align-middle table-custom-header mb-0">
+                            <table class="table table-hover align-middle table-custom-header table-bordered-rows mb-0">
                                 <thead>
                                     <tr>
                                         <th style="width: 45px;">#</th>
@@ -281,12 +289,13 @@
                             </button>
                         </div>
                         <div class="table-responsive shadow-sm rounded-3">
-                            <table class="table table-hover align-middle table-custom-header mb-0">
+                            <table class="table table-hover align-middle table-custom-header table-bordered-rows mb-0">
                                 <thead>
                                     <tr>
                                         <th style="width: 55px;">#</th>
-                                        <th style="width: 150px;" id="thCompStart">วันที่หยุด</th>
-                                        <th style="width: 120px;" id="thCompDays">จำนวนวัน</th>
+                                        <th style="width: 110px;" id="thCompDayName">วัน</th>
+                                        <th style="width: 140px;" id="thCompStart">วันที่หยุด</th>
+                                        <th style="width: 110px;" id="thCompDays">จำนวนวัน</th>
                                         <th id="thCompTitle">รายละเอียดวันหยุด</th>
                                         <th style="width: 120px;" id="thCompAction" class="admin-only">จัดการ</th>
                                     </tr>
@@ -499,7 +508,7 @@
 
                 <h5 class="fw-bold mb-3 text-secondary" id="myHistoryTitle">ประวัติการลาของคุณ</h5>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle table-custom-header">
+                    <table class="table table-hover align-middle table-custom-header table-bordered-rows">
                         <thead>
                             <tr>
                                 <th id="thMyType">ประเภท</th>
@@ -566,7 +575,7 @@
 
                 <h5 class="fw-bold mb-3 text-secondary" id="tableTitle">ประวัติการลาทั้งหมด</h5>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle table-custom-header">
+                    <table class="table table-hover align-middle table-custom-header table-bordered-rows">
                         <thead>
                             <tr>
                                 <th id="thName">พนักงาน</th>
@@ -620,7 +629,7 @@
                     </div>
                     <div class="card-body p-4">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle table-custom-header">
+                            <table class="table table-hover align-middle table-custom-header table-bordered-rows">
                                 <thead>
                                     <tr>
                                         <th id="thEmpName">ชื่อ</th>
@@ -716,6 +725,25 @@
             if (parts.length >= 3) return `${parts[2].substring(0, 2).padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
         }
         return str;
+    }
+
+    // ฟังก์ชันคำนวณชื่อวันในสัปดาห์จากสตริงวันที่
+    function getDayNameFromDate(dateStr) {
+        if (!dateStr) return '-';
+        const isoStr = parseDateToISO(dateStr);
+        if (!isoStr) return '-';
+        const d = new Date(isoStr);
+        if (isNaN(d.getTime())) return '-';
+
+        const dayNames = {
+            th: ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'],
+            en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+            mm: ['တနင်္ဂနွေ', 'တနင်္လာ', 'အင်္ဂါ', 'ဗုဒ္ဓဟူး', 'ကြာသပတေး', 'သောကြာ', 'စနေ']
+        };
+
+        const dayIndex = d.getDay();
+        const currentLangSet = dayNames[currentLang] || dayNames['th'];
+        return currentLangSet[dayIndex];
     }
 
     function getLeaveTypeBadge(type, label) {
@@ -897,7 +925,7 @@
             lblDashTabLeave: "ตารางลางาน", lblDashTabSaturday: "วันหยุดประจำวันเสาร์", lblDashTabCompany: "วันหยุดบริษัทประจำปี", btnGoAddSat: "เพิ่มวันหยุดเสาร์", btnGoAddComp: "เพิ่มวันหยุดบริษัท",
             thUpImg: "รูป", thUpName: "พนักงาน", thUpType: "ประเภท", thUpStart: "เริ่มวันที่", thUpEnd: "ถึงวันที่", thUpDays: "จำนวน (วัน)", thUpReason: "เหตุผล", thUpStatus: "สถานะ", thUpAction: "จัดการ (Admin)",
             thSatStartDate: "วันที่หยุด", thSatUser: "ชื่อ", thSatTitle: "รายละเอียดวันหยุด", thSatDays: "จำนวนวัน", thSatAction: "จัดการ",
-            thCompStart: "วันที่หยุด", thCompDays: "จำนวนวัน", thCompTitle: "รายละเอียดวันหยุด", thCompAction: "จัดการ",
+            thCompDayName: "วัน", thCompStart: "วันที่หยุด", thCompDays: "จำนวนวัน", thCompTitle: "รายละเอียดวันหยุด", thCompAction: "จัดการ",
             dashTitle: "แดชบอร์ดภาพรวม (WH Pantai)", statTotalLeaves: "การลาทั้งหมด", statSickLeaves: "ลาป่วย (ใช้/โควต้า)", statPersonalLeaves: "ลากิจ (ใช้/โควต้า)", statVacation: "ลาพักร้อน (ใช้/โควต้า)",
             tableTitle: "ประวัติการลาทั้งหมด", thName: "พนักงาน", thType: "ประเภท", thStart: "เริ่ม", thEnd: "สิ้นสุด", thAmount: "จำนวน", thReason: "เหตุผล", thStatus: "สถานะ", thAction: "จัดการ (Admin)",
             empFormTitle: "เพิ่มพนักงานใหม่", lblEmpName: "ชื่อ-นามสกุล", lblEmpUser: "Username", lblEmpPhone: "เบอร์โทรศัพท์", lblEmpDept: "แผนก", btnAddEmp: "เพิ่มพนักงาน",
@@ -920,7 +948,7 @@
             lblDashTabLeave: "Leave Table", lblDashTabSaturday: "Saturday Holidays", lblDashTabCompany: "Company Annual Holidays", btnGoAddSat: "Add Saturday Holiday", btnGoAddComp: "Add Company Holiday",
             thUpImg: "Photo", thUpName: "Employee", thUpType: "Type", thUpStart: "Start Date", thUpEnd: "End Date", thUpDays: "Days", thUpReason: "Reason", thUpStatus: "Status", thUpAction: "Action (Admin)",
             thSatStartDate: "Holiday Date", thSatUser: "Name", thSatTitle: "Holiday Details", thSatDays: "Days", thSatAction: "Action",
-            thCompStart: "Holiday Date", thCompDays: "Days", thCompTitle: "Holiday Details", thCompAction: "Action",
+            thCompDayName: "Day", thCompStart: "Holiday Date", thCompDays: "Days", thCompTitle: "Holiday Details", thCompAction: "Action",
             dashTitle: "WH Pantai Overview Dashboard", statTotalLeaves: "Total Leaves", statSickLeaves: "Sick Leave (Used/Quota)", statPersonalLeaves: "Personal Leave (Used/Quota)", statVacation: "Vacation (Used/Quota)",
             tableTitle: "All Leave History", thName: "Employee", thType: "Type", thStart: "Start", thEnd: "End", thAmount: "Amount", thReason: "Reason", thStatus: "Status", thAction: "Action (Admin)",
             empFormTitle: "Add New Employee", lblEmpName: "Full Name", lblEmpUser: "Username", lblEmpPhone: "Phone Number", lblEmpDept: "Department", btnAddEmp: "Add Employee",
@@ -943,7 +971,7 @@
             lblDashTabLeave: "ခွင့်ယူမှု ဇယား", lblDashTabSaturday: "စနေနေ့ ရုံးပိတ်ရက်များ", lblDashTabCompany: "ကုမ္ပဏီ နှစ်စဉ် ရုံးပိတ်ရက်များ", btnGoAddSat: "စနေ ရုံးပိတ်ရက် ထည့်ရန်", btnGoAddComp: "ကုမ္ပဏီ ရုံးပိတ်ရက် ထည့်ရန်",
             thUpImg: "ပုံ", thUpName: "ဝန်ထမ်း", thUpType: "အမျိုးအစား", thUpStart: "စတင်ရက်", thUpEnd: "ပြီးဆုံးရက်", thUpDays: "ရက်ပေါင်း", thUpReason: "အကြောင်းပြချက်", thUpStatus: "အခြေအနေ", thUpAction: "လုပ်ဆောင်ချက် (Admin)",
             thSatStartDate: "ရုံးပိတ်ရက်", thSatUser: "အမည်", thSatTitle: "အကြောင်းအရာ", thSatDays: "ရက်ပေါင်း", thSatAction: "လုပ်ဆောင်ချက်",
-            thCompStart: "ရုံးပိတ်ရက်", thCompDays: "ရက်ပေါင်း", thCompTitle: "အကြောင်းအရာ", thCompAction: "လုပ်ဆောင်ချက်",
+            thCompDayName: "နေ့", thCompStart: "ရုံးပိတ်ရက်", thCompDays: "ရက်ပေါင်း", thCompTitle: "အကြောင်းအရာ", thCompAction: "လုပ်ဆောင်ချက်",
             dashTitle: "WH Pantai အထွေထွေ ဒက်ရှ်ဘုတ်", statTotalLeaves: "စုစုပေါင်း ခွင့်ယူမှု", statSickLeaves: "စုစုပေါင်း ဆေးခွင့်", statPersonalLeaves: "ရှောင်တခင်ခွင့်", statVacation: "စုစုပေါင်း လုပ်သက်ခွင့်",
             tableTitle: "ခွင့်ယူမှု မှတ်တမ်းအားလုံး", thName: "ဝန်ထမ်း", thType: "အမျိုးအစား", thStart: "စတင်ရက်", thEnd: "ပြီးဆုံးရက်", thAmount: "အရေအတွက်", thReason: "အကြောင်းပြချက်", thStatus: "အခြေအနေ", thAction: "လုပ်ဆောင်ချက် (Admin)",
             empFormTitle: "ဝန်ထမ်းသစ်ထည့်ရန်", lblEmpName: "အမည်အပြည့်အစုံ", lblEmpUser: "Username", lblEmpPhone: "ဖုန်းနံပါတ်", lblEmpDept: "ဌာန", btnAddEmp: "ဝန်ထမ်းထည့်မည်",
@@ -1095,7 +1123,6 @@
         document.getElementById(pageCardId).classList.remove('d-none');
     }
 
-    // ถอด syncToCloud() ออกเพื่อป้องกันไม่ให้ข้อมูลเดิมใน Sheet ถูกเขียนทับเมื่อเปิดเว็บครั้งแรก
     function checkDefaultAdmin() {
         let users = JSON.parse(localStorage.getItem('users')) || [];
         const adminExists = users.some(u => String(u.username || '').trim().toLowerCase() === 'nattapons');
@@ -1967,18 +1994,19 @@
             }
         }
 
-        // 3. ตารางวันหยุดบริษัท
+        // 3. ตารางวันหยุดบริษัทประจำปี (เพิ่มช่องแสดง 'วัน' ด้านหน้าช่องวันที่)
         const companyTbody = document.getElementById('companyTableBody');
         if (companyTbody) {
             companyTbody.innerHTML = '';
             compHolidays.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
             if (compHolidays.length === 0) {
-                const colspanVal = (currentUser && currentUser.role === 'admin') ? 5 : 4;
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 6 : 5;
                 companyTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">ไม่มีรายการวันหยุดบริษัทประจำปี</td></tr>`;
             } else {
                 compHolidays.forEach((item, index) => {
                     let days = item.days || calculateDays(item.startDate, item.endDate);
+                    const dayName = getDayNameFromDate(item.startDate);
 
                     let actionBtns = '';
                     if (currentUser && currentUser.role === 'admin') {
@@ -1991,6 +2019,7 @@
                     companyTbody.innerHTML += `
                         <tr>
                             <td class="text-muted fw-semibold">${index + 1}</td>
+                            <td><span class="badge bg-secondary-subtle text-dark border border-secondary-subtle px-2 py-1">${dayName}</span></td>
                             <td class="fw-bold text-primary">${formatDateDisplay(item.startDate)}</td>
                             <td class="fw-bold text-success">${days} ${lang.txtDayUnit}</td>
                             <td>${item.title}</td>
@@ -2000,7 +2029,7 @@
             }
         }
 
-        // 4. สรุปสถิติการลาของฉัน (คำนวณวันคงเหลือคงที่)
+        // 4. สรุปสถิติการลาของฉัน
         if (currentUser) {
             const selectedMyYear = document.getElementById('userYearSelect') ? document.getElementById('userYearSelect').value : '2026';
             const myLeaves = leaves.filter(l => 
@@ -2040,25 +2069,26 @@
                 if (allMyLeaves.length === 0) {
                     myHistoryTbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted p-4">${lang.noHistoryMsg}</td></tr>`;
                 } else {
-                    allMyLeaves.forEach(l => {
-                        const d = getLeaveDaysVal(l);
-                        let typeLabel = l.leaveType === 'sick' ? lang.optSick : (l.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
-                        let typeBadge = getLeaveTypeBadge(l.leaveType, typeLabel);
-                        let statusBadge = (l.status === 'approved') 
-                            ? `<span class="badge bg-success px-2 py-1">${lang.approvedStatus}</span>` 
-                            : `<span class="badge bg-warning text-dark px-2 py-1">${lang.pendingStatus}</span>`;
+                    allMyLeaves.forEach(leave => {
+                        const days = getLeaveDaysVal(leave);
+                        let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                        let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                        
+                        let statusBadge = (leave.status === 'approved') 
+                            ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                            : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
 
                         myHistoryTbody.innerHTML += `
                             <tr>
                                 <td>${typeBadge}</td>
-                                <td>${formatDateDisplay(l.startDate)}</td>
-                                <td>${formatDateDisplay(l.endDate)}</td>
-                                <td class="fw-bold text-primary">${d} ${lang.txtDayUnit}</td>
-                                <td>${l.reason}</td>
+                                <td>${formatDateDisplay(leave.startDate)}</td>
+                                <td>${formatDateDisplay(leave.endDate)}</td>
+                                <td class="fw-bold text-primary">${days} ${lang.txtDayUnit}</td>
+                                <td>${leave.reason}</td>
                                 <td>${statusBadge}</td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${l.id}')">✏️ ${lang.editBtn}</button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${l.id}')">🗑️</button>
+                                    <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>
                                 </td>
                             </tr>`;
                     });
@@ -2066,74 +2096,64 @@
             }
         }
 
-        // 5. หน้า แดชบอร์ด & ประวัติ สำหรับ Admin (รองรับการดูโควต้าพนักงานอื่นได้อย่างถูกต้อง)
-        const adminEmpFilter = document.getElementById('adminEmpFilter');
-        const adminYearSelect = document.getElementById('adminYearSelect');
+        // 5. แดชบอร์ดภาพรวม Admin (หน้า dashboardView)
         const leaveTableBody = document.getElementById('leaveTableBody');
-
-        if (adminEmpFilter && adminYearSelect && leaveTableBody) {
-            const filterEmp = adminEmpFilter.value || 'ALL';
-            const filterYear = adminYearSelect.value || '2026';
+        if (leaveTableBody) {
+            leaveTableBody.innerHTML = '';
+            
+            const selectedEmp = document.getElementById('adminEmpFilter') ? document.getElementById('adminEmpFilter').value : 'ALL';
+            const selectedYear = document.getElementById('adminYearSelect') ? document.getElementById('adminYearSelect').value : '2026';
 
             let filteredLeaves = leaves.filter(l => {
-                const matchEmp = (filterEmp === 'ALL' || String(l.empName || '').trim() === String(filterEmp).trim());
-                const matchYear = (filterYear === 'ALL' || parseDateToISO(l.startDate).startsWith(filterYear));
+                const matchEmp = (selectedEmp === 'ALL' || String(l.empName || '').trim() === selectedEmp);
+                const matchYear = (selectedYear === 'ALL' || parseDateToISO(l.startDate).startsWith(selectedYear));
                 return matchEmp && matchYear;
             });
 
-            let sickCount = 0, personalCount = 0, vacationCount = 0;
-            const approvedFiltered = filteredLeaves.filter(l => l.status === 'approved');
-
-            approvedFiltered.forEach(l => {
-                const d = getLeaveDaysVal(l);
-                if (l.leaveType === 'sick') sickCount += d;
-                else if (l.leaveType === 'personal') personalCount += d;
-                else if (l.leaveType === 'vacation') vacationCount += d;
+            let totalSick = 0, totalPersonal = 0, totalVacation = 0;
+            filteredLeaves.forEach(l => {
+                if (l.status === 'approved') {
+                    const d = getLeaveDaysVal(l);
+                    if (l.leaveType === 'sick') totalSick += d;
+                    else if (l.leaveType === 'personal') totalPersonal += d;
+                    else if (l.leaveType === 'vacation') totalVacation += d;
+                }
             });
 
             document.getElementById('countTotal').innerText = filteredLeaves.length;
+            document.getElementById('countSick').innerText = `${totalSick}/30`;
+            document.getElementById('countPersonal').innerText = `${totalPersonal}/6`;
+            document.getElementById('countVacation').innerText = `${totalVacation}/7`;
 
-            if (filterEmp !== 'ALL') {
-                let targetEmp = emps.find(e => String(e.name || '').trim() === String(filterEmp).trim());
-                let quota = (targetEmp && targetEmp.quota) ? targetEmp.quota : { sick: 30, personal: 6, vacation: 7 };
-
-                document.getElementById('countSick').innerText = `${sickCount}/${quota.sick} = ${quota.sick - sickCount} วัน`;
-                document.getElementById('countPersonal').innerText = `${personalCount}/${quota.personal} = ${quota.personal - personalCount} วัน`;
-                document.getElementById('countVacation').innerText = `${vacationCount}/${quota.vacation} = ${quota.vacation - vacationCount} วัน`;
-            } else {
-                document.getElementById('countSick').innerText = `${sickCount} วัน`;
-                document.getElementById('countPersonal').innerText = `${personalCount} วัน`;
-                document.getElementById('countVacation').innerText = `${vacationCount} วัน`;
-            }
-
-            leaveTableBody.innerHTML = '';
             if (filteredLeaves.length === 0) {
-                leaveTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4">ไม่พบรายการข้อมูลการลา</td></tr>`;
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 8 : 7;
+                leaveTableBody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">${lang.noHistoryMsg}</td></tr>`;
             } else {
-                filteredLeaves.forEach(l => {
-                    const d = getLeaveDaysVal(l);
-                    let typeLabel = l.leaveType === 'sick' ? lang.optSick : (l.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
-                    let typeBadge = getLeaveTypeBadge(l.leaveType, typeLabel);
-                    let statusBadge = (l.status === 'approved') 
-                        ? `<span class="badge bg-success px-2 py-1">${lang.approvedStatus}</span>` 
-                        : `<span class="badge bg-warning text-dark px-2 py-1">${lang.pendingStatus}</span>`;
+                filteredLeaves.forEach(leave => {
+                    const days = getLeaveDaysVal(leave);
+                    let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                    let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                    
+                    let statusBadge = (leave.status === 'approved') 
+                        ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                        : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
 
-                    let approveBtnHtml = (l.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${l.id}')">${lang.approveBtn}</button>` : '';
+                    let adminActionCell = '';
+                    if (currentUser && currentUser.role === 'admin') {
+                        let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
+                        adminActionCell = `<td class="admin-only">${approveBtnHtml}<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button><button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button></td>`;
+                    }
 
                     leaveTableBody.innerHTML += `
                         <tr>
-                            <td class="fw-bold">${l.empName}</td>
+                            <td class="fw-bold">${leave.empName}</td>
                             <td>${typeBadge}</td>
-                            <td>${formatDateDisplay(l.startDate)}</td>
-                            <td>${formatDateDisplay(l.endDate)}</td>
-                            <td class="fw-bold text-primary">${d} ${lang.txtDayUnit}</td>
-                            <td>${l.reason}</td>
+                            <td>${formatDateDisplay(leave.startDate)}</td>
+                            <td>${formatDateDisplay(leave.endDate)}</td>
+                            <td class="fw-bold text-primary">${days} ${lang.txtDayUnit}</td>
+                            <td>${leave.reason}</td>
                             <td>${statusBadge}</td>
-                            <td>
-                                ${approveBtnHtml}
-                                <button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${l.id}')">✏️ ${lang.editBtn}</button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${l.id}')">🗑️</button>
-                            </td>
+                            ${adminActionCell}
                         </tr>`;
                 });
             }
