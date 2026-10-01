@@ -19,7 +19,7 @@
 
         .brand-logo { max-width: 180px; height: auto; display: block; margin: 0 auto 10px auto; }
         .nav-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; cursor: pointer; }
-        .table-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1; }
+        .table-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1; display: inline-block; }
         .profile-avatar-preview { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #6366f1; margin: 0 auto 10px auto; display: block; }
         .form-user-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #3b82f6; margin: 0 auto 10px auto; display: block; }
         
@@ -34,7 +34,14 @@
         .card-header-profile { background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: white; }
 
         .table-custom-header thead { background-color: #1e293b; color: #ffffff; }
-        .table-custom-header th { border: none; padding: 12px 16px; }
+        /* จัดหัวตารางและข้อมูลตารางใน Dashboard ให้อยู่กึ่งกลาง */
+        .table-custom-header th, 
+        .table-custom-header td { 
+            border: none; 
+            padding: 12px 16px; 
+            text-align: center !important; 
+            vertical-align: middle !important; 
+        }
 
         .btn-lang { background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.4); backdrop-filter: blur(5px); }
         .btn-lang:hover { background: rgba(255, 255, 255, 0.3); color: white; }
@@ -219,6 +226,7 @@
                     </button>
                 </div>
 
+                <!-- 1. ตารางลางาน -->
                 <div id="dashSubLeave" class="dash-sub-view">
                     <p class="text-muted small mb-3" id="upcomingDesc">* แสดงเฉพาะรายการที่ยังไม่ถึงกำหนดหรือกำลังอยู่ในช่วงลาเท่านั้น</p>
                     <div class="table-responsive">
@@ -230,7 +238,7 @@
                                     <th id="thUpType">ประเภท</th>
                                     <th id="thUpStart">เริ่มวันที่</th>
                                     <th id="thUpEnd">ถึงวันที่</th>
-                                    <th id="thUpDays" class="text-center">จำนวน (วัน)</th>
+                                    <th id="thUpDays">จำนวน (วัน)</th>
                                     <th id="thUpReason" class="admin-only">เหตุผล</th>
                                     <th id="thUpStatus">สถานะ</th>
                                     <th id="thUpAction" class="admin-only">จัดการ (Admin)</th>
@@ -241,6 +249,7 @@
                     </div>
                 </div>
 
+                <!-- 2. วันหยุดประจำวันเสาร์ -->
                 <div id="dashSubSaturday" class="dash-sub-view d-none">
                     <div class="sat-table-container">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -253,12 +262,12 @@
                             <table class="table table-hover align-middle table-custom-header mb-0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 45px;" class="text-center">#</th>
-                                        <th style="width: 115px;" class="text-center" id="thSatStartDate">วันที่หยุด</th>
-                                        <th style="width: 130px;" class="text-center" id="thSatUser">ชื่อ</th>
-                                        <th id="thSatTitle" class="text-start">รายละเอียดวันหยุด</th>
-                                        <th style="width: 95px;" id="thSatDays" class="text-center">จำนวนวัน</th>
-                                        <th style="width: 105px;" id="thSatAction" class="admin-only text-center">จัดการ</th>
+                                        <th style="width: 45px;">#</th>
+                                        <th style="width: 115px;" id="thSatStartDate">วันที่หยุด</th>
+                                        <th style="width: 130px;" id="thSatUser">ชื่อ</th>
+                                        <th id="thSatTitle">รายละเอียดวันหยุด</th>
+                                        <th style="width: 95px;" id="thSatDays">จำนวนวัน</th>
+                                        <th style="width: 105px;" id="thSatAction" class="admin-only">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody id="saturdayTableBody"></tbody>
@@ -267,6 +276,7 @@
                     </div>
                 </div>
 
+                <!-- 3. วันหยุดบริษัทประจำปี -->
                 <div id="dashSubCompany" class="dash-sub-view d-none">
                     <div class="dash-compact-container mx-auto">
                         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -279,11 +289,11 @@
                             <table class="table table-hover align-middle table-custom-header mb-0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 55px;" class="text-center">#</th>
-                                        <th style="width: 150px;" class="text-center" id="thCompStart">วันที่หยุด</th>
-                                        <th style="width: 120px;" id="thCompDays" class="text-center">จำนวนวัน</th>
-                                        <th id="thCompTitle" class="text-start">รายละเอียดวันหยุด</th>
-                                        <th style="width: 120px;" id="thCompAction" class="admin-only text-center">จัดการ</th>
+                                        <th style="width: 55px;">#</th>
+                                        <th style="width: 150px;" id="thCompStart">วันที่หยุด</th>
+                                        <th style="width: 120px;" id="thCompDays">จำนวนวัน</th>
+                                        <th id="thCompTitle">รายละเอียดวันหยุด</th>
+                                        <th style="width: 120px;" id="thCompAction" class="admin-only">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody id="companyTableBody"></tbody>
@@ -321,6 +331,7 @@
                     </li>
                 </ul>
 
+                <!-- ฟอร์ม 1: ฟอร์มขอลางาน -->
                 <div id="formSectionLeave" class="form-section-item">
                     <div class="text-center mb-4">
                         <img id="formUserAvatar" src="" alt="User Avatar" class="form-user-avatar shadow-sm">
@@ -369,6 +380,7 @@
                     </form>
                 </div>
 
+                <!-- ฟอร์ม 2: บันทึกวันหยุดประจำวันเสาร์ -->
                 <div id="formSectionSaturday" class="form-section-item d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold text-primary mb-0" id="satFormHeaderTitle">แบบฟอร์มบันทึกวันหยุดประจำวันเสาร์</h5>
@@ -409,6 +421,7 @@
                     </form>
                 </div>
 
+                <!-- ฟอร์ม 3: บันทึกวันหยุดบริษัทประจำปี -->
                 <div id="formSectionCompany" class="form-section-item d-none">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold text-primary mb-0" id="compFormHeaderTitle">แบบฟอร์มบันทึกวันหยุดบริษัทประจำปี</h5>
@@ -475,19 +488,19 @@
                     <div class="col-md-4 mb-2">
                         <div class="card stat-card bg-danger p-3 shadow-sm text-center">
                             <h6 id="statMySick" class="opacity-75">ลาป่วย (ใช้ไป/โควต้า)</h6>
-                            <h2 class="mb-0 fw-bold"><span id="countMySick">0/30</span> <small class="fs-6" id="txtDayUnit2">วัน</small></h2>
+                            <h2 class="mb-0 fw-bold"><span id="countMySick">0/30 = คงเหลือ 30</span> <small class="fs-6" id="txtDayUnit2">วัน</small></h2>
                         </div>
                     </div>
                     <div class="col-md-4 mb-2">
                         <div class="card stat-card bg-warning text-dark p-3 shadow-sm text-center">
                             <h6 id="statMyPersonal" class="opacity-75">ลากิจ (ใช้ไป/โควต้า)</h6>
-                            <h2 class="mb-0 fw-bold"><span id="countMyPersonal">0/6</span> <small class="fs-6" id="txtDayUnit3">วัน</small></h2>
+                            <h2 class="mb-0 fw-bold"><span id="countMyPersonal">0/6 = คงเหลือ 6</span> <small class="fs-6" id="txtDayUnit3">วัน</small></h2>
                         </div>
                     </div>
                     <div class="col-md-4 mb-2">
                         <div class="card stat-card bg-success p-3 shadow-sm text-center">
                             <h6 id="statMyVacation" class="opacity-75">ลาพักร้อน (ใช้ไป/โควต้า)</h6>
-                            <h2 class="mb-0 fw-bold"><span id="countMyVacation">0/7</span> <small class="fs-6" id="txtDayUnit4">วัน</small></h2>
+                            <h2 class="mb-0 fw-bold"><span id="countMyVacation">0/7 = คงเหลือ 7</span> <small class="fs-6" id="txtDayUnit4">วัน</small></h2>
                         </div>
                     </div>
                 </div>
@@ -500,7 +513,7 @@
                                 <th id="thMyType">ประเภท</th>
                                 <th id="thMyStart">เริ่มวันที่</th>
                                 <th id="thMyEnd">ถึงวันที่</th>
-                                <th id="thMyDays" class="text-center">จำนวน (วัน)</th>
+                                <th id="thMyDays">จำนวน (วัน)</th>
                                 <th id="thMyReason">เหตุผล</th>
                                 <th id="thMyStatus">สถานะ</th>
                                 <th id="thMyActions">จัดการ</th>
@@ -513,7 +526,7 @@
         </div>
     </div>
 
-    <!-- 3.4 หน้า Dashboard ภาพรวม Admin (แดชบอร์ด & ประวัติ) -->
+    <!-- 3.4 หน้า Dashboard ภาพรวม Admin -->
     <div id="dashboardView" class="page-section">
         <div class="card shadow-sm mb-4">
             <div class="card-header card-header-admin p-3">
@@ -568,7 +581,7 @@
                                 <th id="thType">ประเภท</th>
                                 <th id="thStart">เริ่ม</th>
                                 <th id="thEnd">สิ้นสุด</th>
-                                <th id="thAmount" class="text-center">จำนวน</th>
+                                <th id="thAmount">จำนวน</th>
                                 <th id="thReason">เหตุผล</th>
                                 <th id="thStatus">สถานะ</th>
                                 <th id="thAction">จัดการ (Admin)</th>
@@ -644,7 +657,7 @@
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyw81vJP7GRbAzydpjsADKIeMbbNV_R7STix5BORy90_d_Vob8hKs9biWbc3t7kpXye7Q/exec";
 
     let profileOffcanvasInstance = null;
-    let hasFetchedCloudData = false; // ตัวแปรล็อกความปลอดภัย ป้องกันการส่งข้อมูลว่างทับ Sheet
+    let isDataFetched = false; // ตัวแปรป้องกันการเขียนทับข้อมูล Google Sheet หากยังไม่ได้ดึงข้อมูลสำเร็จ
 
     function openProfileModal() {
         if (!profileOffcanvasInstance) {
@@ -796,8 +809,8 @@
                     localStorage.setItem('employees', JSON.stringify(formattedEmps));
                 }
 
-                hasFetchedCloudData = true; // ยืนยันว่าได้ดึงข้อมูลแล้ว
-
+                isDataFetched = true; // ตั้งค่าสถานะว่าดึงข้อมูลจาก Cloud แล้ว
+                checkDefaultAdmin();
                 loadEmployees();
                 loadLeaves();
             }
@@ -811,10 +824,9 @@
     // 2. ส่งข้อมูลขึ้น Cloud
     async function syncToCloud() {
         if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("วาง_WEB_APP_URL")) return;
-        
-        // ป้องกันข้อมูลว่างทับ Google Sheet: หากยังไม่เคยดึงข้อมูล ให้ดึงข้อมูลมาก่อนส่ง
-        if (!hasFetchedCloudData) {
-            await fetchCloudData();
+        if (!isDataFetched) {
+            console.warn("ยับยั้งการซิงค์ข้อมูลชั่วคราว เนื่องจากยังไม่ได้ดึงข้อมูลเริ่มต้นจาก Google Sheet");
+            return;
         }
 
         showSyncSpinner(true);
@@ -925,7 +937,7 @@
             dashTitle: "WH Pantai Overview Dashboard", statTotalLeaves: "Total Leaves", statSickLeaves: "Sick Leave (Used/Quota)", statPersonalLeaves: "Personal Leave (Used/Quota)", statVacation: "Vacation (Used/Quota)",
             tableTitle: "All Leave History", thName: "Employee", thType: "Type", thStart: "Start", thEnd: "End", thAmount: "Amount", thReason: "Reason", thStatus: "Status", thAction: "Action (Admin)",
             empFormTitle: "Add New Employee", lblEmpName: "Full Name", lblEmpUser: "Username", lblEmpPhone: "Phone Number", lblEmpDept: "Department", btnAddEmp: "Add Employee",
-            empTableTitle: "Employee Directory", thEmpName: "Name", thEmpPhone: "Phone", thEmpDept: "Department", thEmpRole: "Role", thEmpAction: "Action", deleteBtn: "Delete", editBtn: "Edit", cancelBtn: "Cancel", resetPassBtn: "🔑 Reset", setQuotaBtn: "⚙️️ Quotas", approveBtn: "✅ Approve", pendingStatus: "⏳ Pending", approvedStatus: "🟢 Approved",
+            empTableTitle: "Employee Directory", thEmpName: "Name", thEmpPhone: "Phone", thEmpDept: "Department", thEmpRole: "Role", thEmpAction: "Action", deleteBtn: "Delete", editBtn: "Edit", cancelBtn: "Cancel", resetPassBtn: "🔑 Reset", setQuotaBtn: "⚙️ Quotas", approveBtn: "✅ Approve", pendingStatus: "⏳ Pending", approvedStatus: "🟢 Approved",
             txtDayUnit: "Days", txtCountUnit: "Times", noLeavesMsg: "No upcoming leave requests found.", noHistoryMsg: "No leave history found for this year."
         },
         mm: {
@@ -1117,7 +1129,9 @@
                 emps.push({ id: Date.now(), name: 'Nattapons (WH Pantai Admin)', phone: '0800000000', dept: 'WH Pantai', quota: { sick: 30, personal: 6, vacation: 7 } });
                 localStorage.setItem('employees', JSON.stringify(emps));
             }
-            syncToCloud();
+            if (isDataFetched) {
+                syncToCloud();
+            }
         }
     }
 
@@ -1542,12 +1556,12 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td class="fw-bold">${emp.name}</td>
-                        <td>${usernameDisplay}</td>
-                        <td>${phoneDisplay}</td>
-                        <td>${quotaDisplay}</td>
-                        <td style="width: 130px;">${roleHtml}</td>
-                        <td>
+                        <td class="fw-bold text-center">${emp.name}</td>
+                        <td class="text-center">${usernameDisplay}</td>
+                        <td class="text-center">${phoneDisplay}</td>
+                        <td class="text-center">${quotaDisplay}</td>
+                        <td style="width: 130px;" class="text-center">${roleHtml}</td>
+                        <td class="text-center">
                             ${actionBtnsHtml}
                             <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')">${lang.deleteBtn}</button>
                         </td>
@@ -1566,9 +1580,7 @@
         }
     }
 
-    // ==========================================
-    // บันทึกและจัดการ: ฟอร์มการลา
-    // ==========================================
+    // ฟอร์มขอลางาน
     document.getElementById('leaveForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const empName = currentUser.fullName;
@@ -1675,9 +1687,7 @@
         }
     }
 
-    // ==========================================
-    // บันทึกและจัดการ: วันหยุดประจำวันเสาร์
-    // ==========================================
+    // วันหยุดประจำวันเสาร์
     document.getElementById('saturdayForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const startRaw = document.getElementById('satStartDate').value;
@@ -1779,9 +1789,7 @@
         }
     }
 
-    // ==========================================
-    // บันทึกและจัดการ: วันหยุดบริษัทประจำปี
-    // ==========================================
+    // วันหยุดบริษัทประจำปี
     document.getElementById('companyForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const startRaw = document.getElementById('compStartDate').value;
@@ -1813,7 +1821,7 @@
                 compHolidays[idx].createdByName = adminName;
             }
             playAudioNotification('success');
-            alert('แก้ไขรายการวันหยุดบริษัทเรียบร้อยแล้ว!');
+            alert('แก้ไขวันหยุดบริษัทเรียบร้อยแล้ว!');
         } else {
             compHolidays.push({
                 id: Date.now(),
@@ -1879,275 +1887,270 @@
         }
     }
 
-    // ==========================================
-    // ฟังก์ชันโหลดข้อมูลแสดงผลทุกตาราง
-    // ==========================================
+    // โหลดข้อมูลแสดงผลในตารางต่างๆ
     function loadLeaves() {
-        const leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
-        const satHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
-        const compHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const emps = JSON.parse(localStorage.getItem('employees')) || [];
+        let leaves = JSON.parse(localStorage.getItem('leaveData')) || [];
+        let satHolidays = JSON.parse(localStorage.getItem('saturdayHolidays')) || [];
+        let compHolidays = JSON.parse(localStorage.getItem('companyHolidays')) || [];
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let emps = JSON.parse(localStorage.getItem('employees')) || [];
         const lang = translations[currentLang];
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        const dateDisplayEl = document.getElementById('txtCurrentDateInfo');
+        if (dateDisplayEl) dateDisplayEl.innerText = `วันนี้: ${formatDateDisplay(todayStr)}`;
 
-        const todayObj = new Date();
-        const yyyy = todayObj.getFullYear();
-        const mm = String(todayObj.getMonth() + 1).padStart(2, '0');
-        const dd = String(todayObj.getDate()).padStart(2, '0');
-        const todayISO = `${yyyy}-${mm}-${dd}`;
+        // 1. Dashboard ลางาน
+        const upcomingTbody = document.getElementById('upcomingTableBody');
+        if(upcomingTbody) {
+            upcomingTbody.innerHTML = '';
+            const activeLeaves = leaves.filter(leave => parseDateToISO(leave.endDate) >= todayStr);
 
-        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const dateStr = todayObj.toLocaleDateString(currentLang === 'th' ? 'th-TH' : (currentLang === 'mm' ? 'my-MM' : 'en-US'), dateOptions);
-        const txtDateEl = document.getElementById('txtCurrentDateInfo');
-        if (txtDateEl) txtDateEl.innerText = `วันนี้: ${dateStr}`;
-
-        // 1. ตารางลางานปัจจุบัน/กำลังจะถึง
-        const upcomingBody = document.getElementById('upcomingTableBody');
-        if (upcomingBody) {
-            upcomingBody.innerHTML = '';
-            const activeLeaves = leaves.filter(l => (l.endDate || l.startDate) >= todayISO);
-
-            if (activeLeaves.length === 0) {
-                upcomingBody.innerHTML = `<tr><td colspan="9" class="text-center text-muted py-4">${lang.noLeavesMsg}</td></tr>`;
+            if(activeLeaves.length === 0) {
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 9 : 7;
+                upcomingTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">${lang.noLeavesMsg}</td></tr>`;
             } else {
-                activeLeaves.forEach(l => {
-                    const uObj = users.find(u => String(u.fullName || '').trim() === String(l.empName || '').trim());
-                    const avatarSrc = uObj && uObj.avatar ? uObj.avatar : defaultAvatar;
-                    const typeLabel = lang['opt' + l.leaveType.charAt(0).toUpperCase() + l.leaveType.slice(1)] || l.leaveType;
-                    const typeBadge = getLeaveTypeBadge(l.leaveType, typeLabel);
-                    const daysVal = getLeaveDaysVal(l);
+                activeLeaves.forEach(leave => {
+                    const days = getLeaveDaysVal(leave);
+                    let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                    let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
                     
-                    let statusHtml = l.status === 'approved' 
-                        ? `<span class="badge bg-success">${lang.approvedStatus}</span>` 
-                        : `<span class="badge bg-warning text-dark">${lang.pendingStatus}</span>`;
+                    let statusBadge = (leave.status === 'approved') 
+                        ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                        : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
 
-                    let adminActions = '';
+                    const empUser = users.find(u => String(u.fullName || '').trim() === String(leave.empName || '').trim());
+                    const empAvatar = (empUser && empUser.avatar) ? empUser.avatar : defaultAvatar;
+
+                    const reasonCell = (currentUser && currentUser.role === 'admin') ? `<td class="admin-only text-center">${leave.reason}</td>` : '';
+                    
+                    let adminActionCell = '';
                     if (currentUser && currentUser.role === 'admin') {
-                        if (l.status !== 'approved') {
-                            adminActions += `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${l.id}')">${lang.approveBtn}</button>`;
-                        }
-                        adminActions += `<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${l.id}')">${lang.editBtn}</button>`;
-                        adminActions += `<button class="btn btn-danger btn-sm" onclick="deleteLeave('${l.id}')">${lang.deleteBtn}</button>`;
+                        let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
+                        adminActionCell = `<td class="admin-only text-center">${approveBtnHtml}<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button><button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button></td>`;
                     }
 
-                    upcomingBody.innerHTML += `
+                    upcomingTbody.innerHTML += `
                         <tr>
-                            <td><img src="${avatarSrc}" class="table-avatar" alt="Avatar"></td>
-                            <td class="fw-bold">${l.empName}</td>
-                            <td>${typeBadge}</td>
-                            <td>${formatDateDisplay(l.startDate)}</td>
-                            <td>${formatDateDisplay(l.endDate)}</td>
-                            <td class="text-center fw-bold">${daysVal}</td>
-                            <td class="admin-only">${l.reason || '-'}</td>
-                            <td>${statusHtml}</td>
-                            <td class="admin-only">${adminActions}</td>
+                            <td class="text-center"><img src="${empAvatar}" alt="${leave.empName}" class="table-avatar shadow-sm"></td>
+                            <td class="fw-bold text-center">${leave.empName}</td>
+                            <td class="text-center">${typeBadge}</td>
+                            <td class="text-center">${formatDateDisplay(leave.startDate)}</td>
+                            <td class="text-center">${formatDateDisplay(leave.endDate)}</td>
+                            <td class="fw-bold text-primary text-center">${days} ${lang.txtDayUnit}</td>
+                            ${reasonCell}
+                            <td class="text-center">${statusBadge}</td>
+                            ${adminActionCell}
                         </tr>`;
                 });
             }
         }
 
-        // 2. ตารางวันหยุดเสาร์
-        const satBody = document.getElementById('saturdayTableBody');
-        if (satBody) {
-            satBody.innerHTML = '';
+        // 2. Dashboard วันหยุดประจำวันเสาร์
+        const saturdayTbody = document.getElementById('saturdayTableBody');
+        if (saturdayTbody) {
+            saturdayTbody.innerHTML = '';
+            satHolidays.sort((a, b) => new Date(a.startDate || a.date) - new Date(b.startDate || b.date));
+
             if (satHolidays.length === 0) {
-                satBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-3">ไม่มีรายการวันหยุดเสาร์</td></tr>`;
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 6 : 5;
+                saturdayTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">ไม่มีรายการวันหยุดประจำวันเสาร์</td></tr>`;
             } else {
-                satHolidays.forEach((s, idx) => {
-                    const sStart = s.startDate || s.date;
-                    const sEnd = s.endDate || s.date;
-                    const dateDisp = (sStart === sEnd) ? formatDateDisplay(sStart) : `${formatDateDisplay(sStart)} - ${formatDateDisplay(sEnd)}`;
-                    const daysVal = s.days || calculateDays(sStart, sEnd);
+                satHolidays.forEach((item, index) => {
+                    const startDateDisplay = formatDateDisplay(item.startDate || item.date);
+                    const days = item.days || calculateDays(item.startDate || item.date, item.endDate || item.date) || 1;
+                    const nameDisplay = item.createdByName || '-';
 
-                    let adminActions = '';
+                    let actionBtns = '';
                     if (currentUser && currentUser.role === 'admin') {
-                        adminActions = `
-                            <button class="btn btn-warning btn-sm me-1 py-0 px-2" onclick="startEditSaturday('${s.id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn btn-danger btn-sm py-0 px-2" onclick="deleteSaturday('${s.id}')"><i class="fa-solid fa-trash"></i></button>`;
+                        actionBtns = `<td class="admin-only text-center">` +
+                                     `<button class="btn btn-warning btn-sm me-1 shadow-sm" onclick="startEditSaturday('${item.id}')">✏️ ${lang.editBtn}</button>` +
+                                     `<button class="btn btn-outline-danger btn-sm shadow-sm" onclick="deleteSaturday('${item.id}')">${lang.deleteBtn}</button>` +
+                                     `</td>`;
                     }
 
-                    satBody.innerHTML += `
+                    saturdayTbody.innerHTML += `
                         <tr>
-                            <td class="text-center text-muted">${idx + 1}</td>
-                            <td class="text-center fw-bold">${dateDisp}</td>
-                            <td class="text-center">${s.createdByName || 'Admin'}</td>
-                            <td>${s.title || '-'}</td>
-                            <td class="text-center fw-bold">${daysVal}</td>
-                            <td class="admin-only text-center">${adminActions}</td>
+                            <td class="text-center text-muted fw-semibold">${index + 1}</td>
+                            <td class="fw-bold text-primary text-center">${startDateDisplay}</td>
+                            <td class="text-center"><span class="badge bg-light text-dark border">${nameDisplay}</span></td>
+                            <td class="text-center">${item.title || '-'}</td>
+                            <td class="fw-bold text-center text-success">${days} ${lang.txtDayUnit}</td>
+                            ${actionBtns}
                         </tr>`;
                 });
             }
         }
 
-        // 3. ตารางวันหยุดบริษัท
-        const compBody = document.getElementById('companyTableBody');
-        if (compBody) {
-            compBody.innerHTML = '';
+        // 3. Dashboard วันหยุดบริษัทประจำปี
+        const companyTbody = document.getElementById('companyTableBody');
+        if (companyTbody) {
+            companyTbody.innerHTML = '';
+            compHolidays.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
             if (compHolidays.length === 0) {
-                compBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">ไม่มีรายการวันหยุดบริษัท</td></tr>`;
+                const colspanVal = (currentUser && currentUser.role === 'admin') ? 5 : 4;
+                companyTbody.innerHTML = `<tr><td colspan="${colspanVal}" class="text-center text-muted p-4">ไม่มีรายการวันหยุดบริษัทประจำปี</td></tr>`;
             } else {
-                compHolidays.forEach((c, idx) => {
-                    const dateDisp = (c.startDate === c.endDate) ? formatDateDisplay(c.startDate) : `${formatDateDisplay(c.startDate)} - ${formatDateDisplay(c.endDate)}`;
-                    const daysVal = c.days || calculateDays(c.startDate, c.endDate);
+                compHolidays.forEach((item, index) => {
+                    let days = item.days || calculateDays(item.startDate, item.endDate);
 
-                    let adminActions = '';
+                    let actionBtns = '';
                     if (currentUser && currentUser.role === 'admin') {
-                        adminActions = `
-                            <button class="btn btn-warning btn-sm me-1 py-0 px-2" onclick="startEditCompany('${c.id}')"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="btn btn-danger btn-sm py-0 px-2" onclick="deleteCompany('${c.id}')"><i class="fa-solid fa-trash"></i></button>`;
+                        actionBtns = `<td class="admin-only text-center">` +
+                                     `<button class="btn btn-warning btn-sm me-1 shadow-sm" onclick="startEditCompany('${item.id}')">✏️ ${lang.editBtn}</button>` +
+                                     `<button class="btn btn-outline-danger btn-sm shadow-sm" onclick="deleteCompany('${item.id}')">${lang.deleteBtn}</button>` +
+                                     `</td>`;
                     }
 
-                    compBody.innerHTML += `
+                    companyTbody.innerHTML += `
                         <tr>
-                            <td class="text-center text-muted">${idx + 1}</td>
-                            <td class="text-center fw-bold">${dateDisp}</td>
-                            <td class="text-center fw-bold">${daysVal}</td>
-                            <td>${c.title || '-'}</td>
-                            <td class="admin-only text-center">${adminActions}</td>
+                            <td class="text-center text-muted fw-semibold">${index + 1}</td>
+                            <td class="fw-bold text-primary text-center">${formatDateDisplay(item.startDate)}</td>
+                            <td class="fw-bold text-center text-success">${days} ${lang.txtDayUnit}</td>
+                            <td class="text-center">${item.title}</td>
+                            ${actionBtns}
                         </tr>`;
                 });
             }
         }
 
-        // 4. สรุปการลาของฉัน
+        // 4. สรุปข้อมูลสำหรับ User (คำนวณวันลาคงเหลือ)
         if (currentUser) {
-            const myAvatar = document.getElementById('mySummaryUserAvatar');
-            if (myAvatar) myAvatar.src = currentUser.avatar || defaultAvatar;
-            const myNameDisp = document.getElementById('mySummaryUserDisplay');
-            if (myNameDisp) myNameDisp.innerText = currentUser.fullName;
-
             const selectedYear = document.getElementById('userYearSelect') ? document.getElementById('userYearSelect').value : '2026';
+            document.getElementById('mySummaryUserDisplay').innerText = currentUser.fullName;
+            document.getElementById('mySummaryUserAvatar').src = currentUser.avatar || defaultAvatar;
 
-            const myLeaves = leaves.filter(l => {
-                const matchUser = String(l.empName || '').trim() === String(currentUser.fullName || '').trim();
-                const leaveYear = l.startDate ? l.startDate.substring(0, 4) : '';
-                return matchUser && (selectedYear === 'ALL' || leaveYear === selectedYear);
-            });
-
-            const empRecord = emps.find(e => String(e.name || '').trim() === String(currentUser.fullName || '').trim());
-            let quota = { sick: 30, personal: 6, vacation: 7 };
-            if (empRecord && empRecord.quota) {
-                quota = empRecord.quota;
+            let myEmp = emps.find(e => String(e.name || '').trim() === String(currentUser.fullName || '').trim());
+            let q = { sick: 30, personal: 6, vacation: 7 };
+            if (myEmp && myEmp.quota) {
+                if (typeof myEmp.quota === 'string') {
+                    try { q = JSON.parse(myEmp.quota); } catch(e){}
+                } else if (typeof myEmp.quota === 'object') {
+                    q = myEmp.quota;
+                }
             }
+
+            let myLeaves = leaves.filter(l => {
+                const isUser = String(l.empName || '').trim() === String(currentUser.fullName || '').trim();
+                const yearMatch = parseDateToISO(l.startDate).startsWith(selectedYear);
+                return isUser && yearMatch;
+            });
 
             let usedSick = 0, usedPersonal = 0, usedVacation = 0;
             myLeaves.forEach(l => {
-                const dVal = getLeaveDaysVal(l);
-                if (l.leaveType === 'sick') usedSick += dVal;
-                if (l.leaveType === 'personal') usedPersonal += dVal;
-                if (l.leaveType === 'vacation') usedVacation += dVal;
+                if (l.status === 'approved') {
+                    const days = getLeaveDaysVal(l);
+                    if (l.leaveType === 'sick') usedSick += days;
+                    if (l.leaveType === 'personal') usedPersonal += days;
+                    if (l.leaveType === 'vacation') usedVacation += days;
+                }
             });
 
-            if (document.getElementById('countMySick')) document.getElementById('countMySick').innerText = `${usedSick}/${quota.sick}`;
-            if (document.getElementById('countMyPersonal')) document.getElementById('countMyPersonal').innerText = `${usedPersonal}/${quota.personal}`;
-            if (document.getElementById('countMyVacation')) document.getElementById('countMyVacation').innerText = `${usedVacation}/${quota.vacation}`;
+            const remainSick = Math.max(0, (q.sick || 30) - usedSick);
+            const remainPersonal = Math.max(0, (q.personal || 6) - usedPersonal);
+            const remainVacation = Math.max(0, (q.vacation || 7) - usedVacation);
 
-            const myHistoryBody = document.getElementById('myHistoryTableBody');
-            if (myHistoryBody) {
-                myHistoryBody.innerHTML = '';
+            // แสดงผลในรูปแบบ: 3/7 = คงเหลือ 4
+            if (document.getElementById('countMySick')) {
+                document.getElementById('countMySick').innerText = `${usedSick}/${q.sick || 30} = คงเหลือ ${remainSick}`;
+            }
+            if (document.getElementById('countMyPersonal')) {
+                document.getElementById('countMyPersonal').innerText = `${usedPersonal}/${q.personal || 6} = คงเหลือ ${remainPersonal}`;
+            }
+            if (document.getElementById('countMyVacation')) {
+                document.getElementById('countMyVacation').innerText = `${usedVacation}/${q.vacation || 7} = คงเหลือ ${remainVacation}`;
+            }
+
+            const myHistoryTbody = document.getElementById('myHistoryTableBody');
+            if (myHistoryTbody) {
+                myHistoryTbody.innerHTML = '';
                 if (myLeaves.length === 0) {
-                    myHistoryBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">${lang.noHistoryMsg}</td></tr>`;
+                    myHistoryTbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted p-4">${lang.noHistoryMsg}</td></tr>`;
                 } else {
-                    myLeaves.forEach(l => {
-                        const typeLabel = lang['opt' + l.leaveType.charAt(0).toUpperCase() + l.leaveType.slice(1)] || l.leaveType;
-                        const typeBadge = getLeaveTypeBadge(l.leaveType, typeLabel);
-                        const daysVal = getLeaveDaysVal(l);
-                        
-                        let statusHtml = l.status === 'approved' 
-                            ? `<span class="badge bg-success">${lang.approvedStatus}</span>` 
-                            : `<span class="badge bg-warning text-dark">${lang.pendingStatus}</span>`;
+                    myLeaves.forEach(leave => {
+                        const days = getLeaveDaysVal(leave);
+                        let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                        let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                        let statusBadge = (leave.status === 'approved') 
+                            ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                            : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
 
-                        let actions = `<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${l.id}')">${lang.editBtn}</button>` +
-                                      `<button class="btn btn-danger btn-sm" onclick="deleteLeave('${l.id}')">${lang.deleteBtn}</button>`;
+                        let actionBtns = `<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button>` +
+                                         `<button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>`;
 
-                        myHistoryBody.innerHTML += `
+                        myHistoryTbody.innerHTML += `
                             <tr>
-                                <td>${typeBadge}</td>
-                                <td>${formatDateDisplay(l.startDate)}</td>
-                                <td>${formatDateDisplay(l.endDate)}</td>
-                                <td class="text-center fw-bold">${daysVal}</td>
-                                <td>${l.reason || '-'}</td>
-                                <td>${statusHtml}</td>
-                                <td>${actions}</td>
+                                <td class="text-center">${typeBadge}</td>
+                                <td class="text-center">${formatDateDisplay(leave.startDate)}</td>
+                                <td class="text-center">${formatDateDisplay(leave.endDate)}</td>
+                                <td class="fw-bold text-primary text-center">${days} ${lang.txtDayUnit}</td>
+                                <td class="text-center">${leave.reason || '-'}</td>
+                                <td class="text-center">${statusBadge}</td>
+                                <td class="text-center">${actionBtns}</td>
                             </tr>`;
                     });
                 }
             }
         }
 
-        // 5. แดชบอร์ดภาพรวม Admin
-        if (currentUser && currentUser.role === 'admin') {
-            const adminFilterEmp = document.getElementById('adminEmpFilter') ? document.getElementById('adminEmpFilter').value : 'ALL';
-            const adminFilterYear = document.getElementById('adminYearSelect') ? document.getElementById('adminYearSelect').value : '2026';
+        // 5. แดชบอร์ดภาพรวมสำหรับ Admin
+        const adminYearSelect = document.getElementById('adminYearSelect');
+        const adminEmpFilter = document.getElementById('adminEmpFilter');
+        if (adminYearSelect && adminEmpFilter) {
+            const selYear = adminYearSelect.value;
+            const selEmp = adminEmpFilter.value;
 
-            const filteredLeaves = leaves.filter(l => {
-                const matchEmp = (adminFilterEmp === 'ALL' || String(l.empName || '').trim() === String(adminFilterEmp).trim());
-                const leaveYear = l.startDate ? l.startDate.substring(0, 4) : '';
-                const matchYear = (adminFilterYear === 'ALL' || leaveYear === adminFilterYear);
-                return matchEmp && matchYear;
+            let filtered = leaves.filter(l => {
+                const yearMatch = selYear === 'ALL' || parseDateToISO(l.startDate).startsWith(selYear);
+                const empMatch = selEmp === 'ALL' || String(l.empName || '').trim() === selEmp;
+                return yearMatch && empMatch;
             });
 
-            let totalCount = filteredLeaves.length;
-            let totalSickDays = 0, totalPersonalDays = 0, totalVacationDays = 0;
+            let totalCount = filtered.length;
+            let sickDays = 0, personalDays = 0, vacationDays = 0;
 
-            filteredLeaves.forEach(l => {
-                const dVal = getLeaveDaysVal(l);
-                if (l.leaveType === 'sick') totalSickDays += dVal;
-                if (l.leaveType === 'personal') totalPersonalDays += dVal;
-                if (l.leaveType === 'vacation') totalVacationDays += dVal;
-            });
-
-            let totalSickQuota = 30, totalPersonalQuota = 6, totalVacationQuota = 7;
-            if (adminFilterEmp !== 'ALL') {
-                const empObj = emps.find(e => String(e.name || '').trim() === String(adminFilterEmp).trim());
-                if (empObj && empObj.quota) {
-                    totalSickQuota = empObj.quota.sick;
-                    totalPersonalQuota = empObj.quota.personal;
-                    totalVacationQuota = empObj.quota.vacation;
+            filtered.forEach(l => {
+                if (l.status === 'approved') {
+                    const d = getLeaveDaysVal(l);
+                    if (l.leaveType === 'sick') sickDays += d;
+                    if (l.leaveType === 'personal') personalDays += d;
+                    if (l.leaveType === 'vacation') vacationDays += d;
                 }
-            } else {
-                totalSickQuota = emps.reduce((acc, e) => acc + (e.quota ? e.quota.sick : 30), 0);
-                totalPersonalQuota = emps.reduce((acc, e) => acc + (e.quota ? e.quota.personal : 6), 0);
-                totalVacationQuota = emps.reduce((acc, e) => acc + (e.quota ? e.quota.vacation : 7), 0);
-            }
+            });
 
             if (document.getElementById('countTotal')) document.getElementById('countTotal').innerHTML = `${totalCount} <small class="fs-6">${lang.txtCountUnit}</small>`;
-            if (document.getElementById('countSick')) document.getElementById('countSick').innerHTML = `${totalSickDays}/${totalSickQuota} <small class="fs-6">${lang.txtDayUnit}</small>`;
-            if (document.getElementById('countPersonal')) document.getElementById('countPersonal').innerHTML = `${totalPersonalDays}/${totalPersonalQuota} <small class="fs-6">${lang.txtDayUnit}</small>`;
-            if (document.getElementById('countVacation')) document.getElementById('countVacation').innerHTML = `${totalVacationDays}/${totalVacationQuota} <small class="fs-6">${lang.txtDayUnit}</small>`;
+            if (document.getElementById('countSick')) document.getElementById('countSick').innerHTML = `${sickDays}/30 = เหลือ ${Math.max(0, 30 - sickDays)} <small class="fs-6">${lang.txtDayUnit}</small>`;
+            if (document.getElementById('countPersonal')) document.getElementById('countPersonal').innerHTML = `${personalDays}/6 = เหลือ ${Math.max(0, 6 - personalDays)} <small class="fs-6">${lang.txtDayUnit}</small>`;
+            if (document.getElementById('countVacation')) document.getElementById('countVacation').innerHTML = `${vacationDays}/7 = เหลือ ${Math.max(0, 7 - vacationDays)} <small class="fs-6">${lang.txtDayUnit}</small>`;
 
             const leaveTableBody = document.getElementById('leaveTableBody');
             if (leaveTableBody) {
                 leaveTableBody.innerHTML = '';
-                if (filteredLeaves.length === 0) {
-                    leaveTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">${lang.noHistoryMsg}</td></tr>`;
+                if (filtered.length === 0) {
+                    leaveTableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted p-4">ไม่พบประวัติการลา</td></tr>`;
                 } else {
-                    filteredLeaves.forEach(l => {
-                        const typeLabel = lang['opt' + l.leaveType.charAt(0).toUpperCase() + l.leaveType.slice(1)] || l.leaveType;
-                        const typeBadge = getLeaveTypeBadge(l.leaveType, typeLabel);
-                        const daysVal = getLeaveDaysVal(l);
-                        
-                        let statusHtml = l.status === 'approved' 
-                            ? `<span class="badge bg-success">${lang.approvedStatus}</span>` 
-                            : `<span class="badge bg-warning text-dark">${lang.pendingStatus}</span>`;
+                    filtered.forEach(leave => {
+                        const days = getLeaveDaysVal(leave);
+                        let typeLabel = leave.leaveType === 'sick' ? lang.optSick : (leave.leaveType === 'vacation' ? lang.optVacation : lang.optPersonal);
+                        let typeBadge = getLeaveTypeBadge(leave.leaveType, typeLabel);
+                        let statusBadge = (leave.status === 'approved') 
+                            ? `<span class="badge bg-success px-3 py-2">${lang.approvedStatus}</span>` 
+                            : `<span class="badge bg-warning text-dark px-3 py-2">${lang.pendingStatus}</span>`;
 
-                        let adminActions = '';
-                        if (l.status !== 'approved') {
-                            adminActions += `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${l.id}')">${lang.approveBtn}</button>`;
-                        }
-                        adminActions += `<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${l.id}')">${lang.editBtn}</button>`;
-                        adminActions += `<button class="btn btn-danger btn-sm" onclick="deleteLeave('${l.id}')">${lang.deleteBtn}</button>`;
+                        let approveBtnHtml = (leave.status !== 'approved') ? `<button class="btn btn-success btn-sm me-1" onclick="approveLeave('${leave.id}')">${lang.approveBtn}</button>` : '';
+                        let adminActionCell = `${approveBtnHtml}<button class="btn btn-warning btn-sm me-1" onclick="startEditLeave('${leave.id}')">✏️ ${lang.editBtn}</button><button class="btn btn-outline-danger btn-sm" onclick="deleteLeave('${leave.id}')">🗑️</button>`;
 
                         leaveTableBody.innerHTML += `
                             <tr>
-                                <td class="fw-bold">${l.empName}</td>
-                                <td>${typeBadge}</td>
-                                <td>${formatDateDisplay(l.startDate)}</td>
-                                <td>${formatDateDisplay(l.endDate)}</td>
-                                <td class="text-center fw-bold">${daysVal}</td>
-                                <td>${l.reason || '-'}</td>
-                                <td>${statusHtml}</td>
-                                <td>${adminActions}</td>
+                                <td class="fw-bold text-center">${leave.empName}</td>
+                                <td class="text-center">${typeBadge}</td>
+                                <td class="text-center">${formatDateDisplay(leave.startDate)}</td>
+                                <td class="text-center">${formatDateDisplay(leave.endDate)}</td>
+                                <td class="fw-bold text-primary text-center">${days} ${lang.txtDayUnit}</td>
+                                <td class="text-center">${leave.reason || '-'}</td>
+                                <td class="text-center">${statusBadge}</td>
+                                <td class="text-center">${adminActionCell}</td>
                             </tr>`;
                     });
                 }
@@ -2155,26 +2158,9 @@
         }
     }
 
-    // ==========================================
-    // เริ่มต้นทำงานทันทีเมื่อเปิดหน้าเว็บ (Startup & Initialization)
-    // ==========================================
-    document.addEventListener('DOMContentLoaded', async function() {
-        // ดึงข้อมูลล่าสุดจาก Google Sheets มาใส่ในเครื่องทันที ป้องกันข้อมูลหาย
-        if (GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes("วาง_WEB_APP_URL")) {
-            await fetchCloudData();
-        }
-
-        checkDefaultAdmin();
-
-        // โหลดภาษาและตารางแสดงผล
-        currentLang = 'th';
-        const lang = translations[currentLang];
-        Object.keys(lang).forEach(key => {
-            if(document.getElementById(key)) document.getElementById(key).innerText = lang[key];
-        });
-
-        loadEmployees();
-        loadLeaves();
+    // เมื่อเปิดหน้าเว็บ ดึงข้อมูล Cloud ทันทีเพื่อป้องกันปัญหาข้อมูลหาย
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchCloudData();
     });
 </script>
 </body>
